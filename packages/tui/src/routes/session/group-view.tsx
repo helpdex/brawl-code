@@ -10,6 +10,7 @@ import { EntryAnchor, GroupAnchor, visitEntries } from "./anchor-view"
 import { groupID } from "./anchors"
 import { instructionPaths, type PartRef, type SessionEntry, type SessionGroup, type SessionNode } from "./grouping/session"
 import { summarizeActivity } from "./activity-summary"
+import { counted } from "../../brawl/i18n"
 import { InlineToolRow, reasoningContent, toolDisplay } from "./message-parts"
 import { use } from "./render-context"
 import { resolvePart } from "./rows"
@@ -122,7 +123,7 @@ function GroupContent(props: GroupProps) {
     }, {})
     const names = Object.entries(counts).map(
       ([name, count]) =>
-        `${count} ${count === 1 ? name : name === "search" || name === "fetch" ? `${name}es` : `${name}s`}`,
+        counted(count, name, `${count} ${count === 1 ? name : name === "search" || name === "fetch" ? `${name}es` : `${name}s`}`),
     )
     return `${completed() ? "Explored" : "Exploring"}: ${names.join(", ")}`
   })
@@ -184,7 +185,7 @@ function GroupContent(props: GroupProps) {
             >
               {props.completed ? "Thought" : latest() ? `Thinking: ${latest()}` : "Thinking"}
               <Show when={props.completed && !expanded() && latest()}>: {latest()}</Show>
-              <Show when={props.completed && thoughts().length > 1}> · {thoughts().length} steps</Show>
+              <Show when={props.completed && thoughts().length > 1}> · {counted(thoughts().length, "step", `${thoughts().length} steps`)}</Show>
               <Show when={props.completed && duration()}> · {Locale.duration(duration())}</Show>
             </InlineToolRow>
             <Show when={expanded()}>
