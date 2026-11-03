@@ -1,4 +1,5 @@
 export const ru: Readonly<Record<string, string>> = {
+  "Coding agent on Brawl's own model": "Агент для кода на собственной модели Brawl",
   'Ask anything… "{0}"': "Спросите что угодно… «{0}»",
   'Run a command… "{0}"': "Выполните команду… «{0}»",
   "Fix a TODO in the codebase": "Исправь TODO в коде",

@@ -11,6 +11,7 @@ const english = {
   "settings.about.copyright": "© Brawl · OpenCode © Anomaly Innovations, Inc.",
   "error.page.report.discord": "at brawl.io",
   "dialog.provider.opencode.note": "Brawl Code 1.0 with 262K and 1M context",
+  "settings.about.typeset": "Typeset in Inter and JetBrains Mono",
 }
 
 const russian = {
@@ -22,6 +23,7 @@ const russian = {
   "settings.about.copyright": "© Brawl · OpenCode © Anomaly Innovations, Inc.",
   "error.page.report.discord": "на brawl.io",
   "dialog.provider.opencode.note": "Brawl Code 1.0 с контекстом 262K и 1M",
+  "settings.about.typeset": "Набрано шрифтами Inter и JetBrains Mono",
 }
 
 const wording = new Map<string, Readonly<Record<string, string>>>([
@@ -36,6 +38,7 @@ const required = [
   "settings.about.copyright",
   "error.page.report.discord",
   "dialog.provider.opencode.note",
+  "settings.about.typeset",
 ] as const satisfies ReadonlyArray<keyof typeof english>
 
 export function brand<Dictionary extends Readonly<Record<string, string>>>(

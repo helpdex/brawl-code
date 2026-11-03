@@ -4,7 +4,7 @@ import { epilogue } from "../../src/util/presentation"
 const rows = (text: string | undefined) =>
   Bun.stripANSI(text ?? "")
     .split("\n")
-    .filter((line) => line.trim() && !/[▀▄█]/.test(line))
+    .filter((line) => line.trim() && !/[▀▄█]| \/\/ /.test(line))
 
 test("prints nothing without a session or update", () => {
   expect(epilogue({})).toBeUndefined()

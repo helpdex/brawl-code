@@ -3,7 +3,7 @@ import type { DesktopTheme } from "@opencode/ui/theme/types"
 import { desktopZoomLevels } from "@opencode/app/desktop-menu"
 import { nativeTheme, type BrowserWindowConstructorOptions } from "electron"
 import { Predicate } from "effect"
-import oc2ThemeJson from "../../../../ui/src/theme/themes/oc-2.json"
+import oc2ThemeJson from "../../../../ui/src/brawl/theme.json"
 import { BACKGROUND_COLOR_KEY, ZOOM_LEVEL_KEY } from "../storage/keys"
 import { getStore } from "../storage/store"
 

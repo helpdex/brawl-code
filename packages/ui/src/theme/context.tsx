@@ -4,7 +4,7 @@ import { createEffect, onMount } from "solid-js"
 import { createStore } from "solid-js/store"
 import { makeEventListener } from "@solid-primitives/event-listener"
 import { createSimpleContext } from "../context/helper"
-import oc2ThemeJson from "./themes/oc-2.json"
+import brawlThemeJson from "../brawl/theme.json"
 import { resolveThemeVariant, themeToCss } from "./resolve"
 import { resolveThemeVariantV2, themeV2ToCss } from "./v2/resolve"
 import type { DesktopTheme } from "./types"
@@ -19,6 +19,7 @@ const STORAGE_KEYS = {
 } as const
 
 const THEME_STYLE_ID = "oc-theme"
+const DEFAULT_THEME = "brawl"
 
 let files: Record<string, () => Promise<{ default: DesktopTheme }>> | undefined
 
@@ -50,6 +51,7 @@ function knownThemes() {
 }
 
 const names: Record<string, string> = {
+  brawl: "Brawl",
   "oc-2": "OpenCode",
   amoled: "AMOLED",
   aura: "Aura",
@@ -88,12 +90,12 @@ const names: Record<string, string> = {
   zenburn: "Zenburn",
 }
 
-const oc2Theme = oc2ThemeJson as DesktopTheme
+const defaultTheme = brawlThemeJson as DesktopTheme
 
 function resolveStoredTheme(id: string | null | undefined, registered?: Record<string, DesktopTheme>) {
-  if (id === "oc-2" || (id && (knownThemes().has(id) || registered?.[id]))) return id
+  if (id === DEFAULT_THEME || (id && (knownThemes().has(id) || registered?.[id]))) return id
 
-  return "oc-2"
+  return DEFAULT_THEME
 }
 
 function read(key: string) {
@@ -151,7 +153,7 @@ function applyThemeCss(theme: DesktopTheme, themeId: string, mode: "light" | "da
   const css = themeToCss(tokens)
   const v2 = themeV2ToCss(resolveThemeVariantV2(variant, isDark))
 
-  if (themeId !== "oc-2") {
+  if (themeId !== DEFAULT_THEME) {
     write(isDark ? STORAGE_KEYS.THEME_CSS_DARK : STORAGE_KEYS.THEME_CSS_LIGHT, `${css}\n  ${v2}`)
   }
 
@@ -166,16 +168,16 @@ function applyThemeCss(theme: DesktopTheme, themeId: string, mode: "light" | "da
   ensureThemeStyleElement().textContent = fullCss
   document.documentElement.dataset.theme = themeId
   document.documentElement.dataset.colorScheme = mode
-  document.documentElement.style.backgroundColor = isDark ? "#080808" : "#fafafa"
+  document.documentElement.style.backgroundColor = isDark ? "#09090b" : "#fafafa"
 
   // Update theme-color meta tag to match light/dark mode
   const meta = document.querySelector('meta[name="theme-color"]')
 
-  if (meta) meta.setAttribute("content", isDark ? "#080808" : "#fafafa")
+  if (meta) meta.setAttribute("content", isDark ? "#09090b" : "#fafafa")
 }
 
 function cacheThemeVariants(theme: DesktopTheme, themeId: string) {
-  if (themeId === "oc-2") return
+  if (themeId === DEFAULT_THEME) return
 
   for (const mode of ["light", "dark"] as const) {
     const isDark = mode === "dark"
@@ -206,7 +208,7 @@ export const { use: useTheme, provider: ThemeProvider } = createSimpleContext({
 
     const [store, setStore] = createStore({
       themes: {
-        "oc-2": oc2Theme,
+        [DEFAULT_THEME]: defaultTheme,
       } as Record<string, DesktopTheme>,
       themeId,
       colorScheme,
@@ -277,7 +279,7 @@ export const { use: useTheme, provider: ThemeProvider } = createSimpleContext({
 
         setStore("themeId", next)
 
-        if (next === "oc-2") {
+        if (next === DEFAULT_THEME) {
           clear()
 
           return
@@ -342,7 +344,7 @@ export const { use: useTheme, provider: ThemeProvider } = createSimpleContext({
         return
       }
 
-      if (next !== "oc-2" && !knownThemes().has(next) && !store.themes[next]) {
+      if (next !== DEFAULT_THEME && !knownThemes().has(next) && !store.themes[next]) {
         console.warn(`Theme "${id}" not found`)
 
         return
@@ -350,7 +352,7 @@ export const { use: useTheme, provider: ThemeProvider } = createSimpleContext({
 
       setStore("themeId", next)
 
-      if (next === "oc-2") {
+      if (next === DEFAULT_THEME) {
         write(STORAGE_KEYS.THEME_ID, next)
         clear()
 
@@ -386,7 +388,7 @@ export const { use: useTheme, provider: ThemeProvider } = createSimpleContext({
 
         if (!next) return
 
-        if (next !== "oc-2" && !knownThemes().has(next) && !store.themes[next]) return
+        if (next !== DEFAULT_THEME && !knownThemes().has(next) && !store.themes[next]) return
         setStore("previewThemeId", next)
         void load(next).then((theme) => {
           if (!theme || store.previewThemeId !== next) return

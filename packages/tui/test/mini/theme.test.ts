@@ -10,7 +10,7 @@ import {
   resolveRunTheme,
   type RunTheme,
 } from "../../src/mini/theme"
-import { DEFAULT_THEMES, getOpenCodeTheme, parseTheme } from "../../src/theme"
+import { allThemes, DEFAULT_THEMES, getOpenCodeTheme, parseTheme } from "../../src/theme"
 import { generateSystem } from "../../src/theme/system"
 import { tmpdir } from "../fixture/fixture"
 
@@ -155,7 +155,7 @@ test.each(["light", "dark"] as const)("uses shared %s defaults and named built-i
   for (const name of [undefined, "opencode", "tokyonight"] as const) {
     const theme = await resolveRunTheme(renderer({ colors }), { name, mode })
     const expected = resolveThemeDocument(
-      name === undefined || name === "opencode" ? getOpenCodeTheme() : parseTheme(DEFAULT_THEMES[name]),
+      name === undefined ? parseTheme(allThemes().brawl!) : name === "opencode" ? getOpenCodeTheme() : parseTheme(DEFAULT_THEMES[name]),
       mode,
     )
     try {
@@ -355,7 +355,7 @@ test("uses refreshed background brightness rather than stale mode or ANSI slot z
 })
 
 test.each(["light", "dark"] as const)("follows physical %s mode over opposite configuration", async (mode) => {
-  const expected = resolveThemeDocument(getOpenCodeTheme(), mode)
+  const expected = resolveThemeDocument(parseTheme(allThemes().brawl!), mode)
   for (const fail of [false, true]) {
     const theme = await resolveRunTheme(renderer({ colors: terminalColors({}, mode), themeMode: mode, fail }), {
       mode: mode === "light" ? "dark" : "light",
