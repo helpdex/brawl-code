@@ -258,7 +258,7 @@ export function getConfig() {
         mac: { ...base.mac, icon: "resources/icons/icon.icon" },
         // The DMG volume icon would otherwise use the same actool-generated ICNS.
         dmg: { icon: "resources/icons/icon.icns" },
-        publish: null,
+        publish: { provider: "generic", url: "https://brawl.io/dl/brawl-code-desktop/", channel: "latest" },
         deb: { packageName: "brawl-code", fpm: [metainfoFpm(appId)] },
         rpm: { packageName: "brawl-code", fpm: [rpmNoBuildIdLinksFpm, metainfoFpm(appId)] },
       }

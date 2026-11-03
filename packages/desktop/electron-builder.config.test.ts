@@ -50,7 +50,11 @@ function trimFilter(dir: string, config: Configuration) {
 test.each(channels)("channel identity for $channel", ({ appId, channel }) => {
   const config = load(channel)
   expect(config.appId).toBe(appId)
-  expect(config.publish).toBeNull()
+  expect(config.publish).toEqual(
+    channel === "prod"
+      ? { provider: "generic", url: "https://brawl.io/dl/brawl-code-desktop/", channel: "latest" }
+      : null,
+  )
   expect(config.extraMetadata?.desktopName).toBe(`${appId}.desktop`)
   // The executable must never end in `.desktop`: libappimage resolves the
   // AppImage's desktop entry by globbing `*.desktop`, and an ELF matching

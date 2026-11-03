@@ -14,7 +14,7 @@ const restartTimeout = 10_000
 const unpackTimeout = 120_000
 
 export const make = Effect.fn("Updater.platform")(function* (channel: string) {
-  const userAgent = `opencode/${channel === "prod" ? "latest" : channel}/${app.getVersion()}/desktop`
+  const userAgent = `brawl-code/${channel === "prod" ? "latest" : channel}/${app.getVersion()}/desktop`
   const runFork = Effect.runForkWith(yield* Effect.context())
   updateClient.logger = {
     info: (...args) => runFork(Effect.logInfo(...args)),
