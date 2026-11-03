@@ -74,7 +74,10 @@ test("prompt footer can hide details", async () => {
       text: {
         base: color,
         muted: color,
+        faint: color,
+        feedback: { error: { base: color } },
       },
+      background: { action: { primary: { focused: color } } },
     },
     keymap: {
       shortcuts: (id: string) => {
@@ -124,13 +127,13 @@ test("prompt footer can hide details", async () => {
 
   try {
     await app.renderOnce()
-    expect(app.captureCharFrame()).toContain("1.0K (10%) · $1.00")
+    expect(app.captureCharFrame()).toContain("1K / 10K · $1.00")
     expect(app.captureCharFrame()).toContain("ctrl+p commands")
 
     setShowDetails(false)
     await app.renderOnce()
     const frame = app.captureCharFrame()
-    expect(frame).not.toContain("1.0K (10%)")
+    expect(frame).not.toContain("1K / 10K")
     expect(frame).not.toContain("$1.00")
     expect(frame).not.toContain("ctrl+p commands")
 

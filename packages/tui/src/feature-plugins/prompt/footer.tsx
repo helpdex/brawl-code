@@ -1,6 +1,10 @@
 import { Plugin } from "@opencode/plugin/tui"
 import { createMemo, createSignal, Match, Show, Switch } from "solid-js"
-import { contextUsage, formatContextUsage } from "../../util/session"
+import { contextUsage } from "../../util/session"
+import { Meter } from "../../brawl/session"
+import { contextShort } from "../../brawl/session-text"
+
+const METER_WIDTH = 12
 import { useTerminalDimensions } from "@opentui/solid"
 import { TextAttributes } from "@opentui/core"
 import { useInteractivity } from "../../context/interactivity"
@@ -34,21 +38,25 @@ export function PromptFooter(props: {
       .filter((shell) => shell.metadata.sessionID === props.sessionID).length
     return count ? `${count} shell${count === 1 ? "" : "s"}` : undefined
   })
-  const status = createMemo(() => {
-    if (!props.sessionID) return []
+  const usage = createMemo(() => {
+    if (!props.sessionID) return
     const session = props.context.data.session.get(props.sessionID)
-    if (!session) return []
-    const usage = contextUsage(
+    if (!session) return
+    return contextUsage(
       props.context.data.session.message.list(props.sessionID),
       props.context.data.location.model.list(session.location),
       session.revert?.messageID,
     )
-    const cost = props.context.data.session.cost(props.sessionID)
-    return [
-      usage ? formatContextUsage(usage.tokens, usage.percent) : undefined,
-      cost > 0 ? money.format(cost) : undefined,
-    ].filter((item): item is string => Boolean(item))
   })
+  const status = createMemo(() => {
+    if (!props.sessionID) return []
+    const used = usage()
+    const cost = props.context.data.session.cost(props.sessionID)
+    return [used ? contextShort(used) : undefined, cost > 0 ? money.format(cost) : undefined].filter(
+      (item): item is string => Boolean(item),
+    )
+  })
+  const meter = createMemo(() => (usage()?.limit ? METER_WIDTH : 0))
   const live = createMemo(() => Boolean(subagents() || shells()))
   const goal = createGoal(props.context, () => props.sessionID)
   // Prompt hints read as disabled while the session does not own input, e.g. while a side panel is focused.
@@ -56,12 +64,19 @@ export function PromptFooter(props: {
   const shortcut = (id: string) => props.context.keymap.shortcuts(id)[0]
   const layout = createMemo(() => {
     const command = shortcut("command.palette.show")
-    if (status().length === 0) return { usage: false, shortcuts: dimensions().width >= 44 }
-    return promptFooterLayout({
-      width: Math.max(0, dimensions().width - 8),
-      usage: status(),
-      shortcuts: command ? [`${command} commands`] : [],
-    })
+    if (status().length === 0) return { usage: false, shortcuts: dimensions().width >= 44, meter: false }
+    const fit = (bar: number) =>
+      promptFooterLayout({
+        width: Math.max(0, dimensions().width - 8 - (bar ? bar + 1 : 0)),
+        usage: status(),
+        shortcuts: command ? [`${command} commands`] : [],
+      })
+    const full = fit(meter())
+    if (meter() && !(full.usage && full.shortcuts)) {
+      const plain = fit(0)
+      if (plain.usage && plain.shortcuts) return { ...plain, meter: false }
+    }
+    return { ...full, meter: meter() > 0 && full.usage }
   })
 
   return (
@@ -99,8 +114,16 @@ export function PromptFooter(props: {
                 <GoalStatus context={props.context} sessionID={props.sessionID ?? ""} goal={goal} />
               </Show>
               <Show when={props.showDetails && layout().usage && status().length > 0}>
+                <Show when={live() || goal()}>
+                  <text fg={props.context.theme.text.muted} wrapMode="none" flexShrink={0}>
+                    {" · "}
+                  </text>
+                </Show>
+                <Show when={layout().meter}>
+                  <Meter theme={props.context.theme} percent={usage()?.percent ?? 0} width={meter()} />
+                  <text flexShrink={0}> </text>
+                </Show>
                 <text fg={props.context.theme.text.muted} wrapMode="none" flexShrink={0}>
-                  <Show when={live() || goal()}> · </Show>
                   {status().join(" · ")}
                 </text>
               </Show>

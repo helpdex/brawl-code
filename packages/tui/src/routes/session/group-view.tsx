@@ -125,7 +125,7 @@ function GroupContent(props: GroupProps) {
       ([name, count]) =>
         counted(count, name, `${count} ${count === 1 ? name : name === "search" || name === "fetch" ? `${name}es` : `${name}s`}`),
     )
-    return `${completed() ? "Explored" : "Exploring"}: ${names.join(", ")}`
+    return `${completed() ? "Explored" : "Exploring"} · ${names.join(" · ")}`
   })
   const toggle = () => disclosure.toggle()
   const children = (mode: "normal" | "thought" | "tool") => (
@@ -143,7 +143,8 @@ function GroupContent(props: GroupProps) {
           <Show when={grouped()} fallback={children("normal")}>
             <Show when={tools().length > 0}>
               <InlineToolRow
-                icon={completed() ? "→" : "✱"}
+                icon={completed() ? (expanded() ? "▾" : "✓") : "✱"}
+                iconColor={completed() && !expanded() ? theme.text.feedback.success.base : undefined}
                 color={hover() ? theme.text.base : theme.text.muted}
                 complete={completed()}
                 pending={label()}

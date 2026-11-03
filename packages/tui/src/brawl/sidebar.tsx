@@ -19,7 +19,7 @@ export default Plugin.define({
   id: "brawl.sidebar.account",
   setup(context) {
     context.ui.slot({
-      append: "sidebar.content",
+      append: "sidebar.footer",
       render: () => <SidebarBrawl />,
     })
   },

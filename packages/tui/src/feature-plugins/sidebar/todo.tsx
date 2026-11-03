@@ -1,6 +1,6 @@
 import { Plugin } from "@opencode/plugin/tui"
 import { createMemo, For, Show } from "solid-js"
-import { TodoItem } from "../../component/todo-item"
+import { PlanItem, SectionTitle } from "../../brawl/session"
 import { sessionTodos } from "../../util/todo"
 
 export function SidebarTodo(props: { context: Plugin.Context; sessionID: string }) {
@@ -30,17 +30,14 @@ export function SidebarTodo(props: { context: Plugin.Context; sessionID: string 
           }}
         >
           <Show when={list().length > 2}>
-            <text fg={theme.text.base}>{view.open ? "▼" : "▶"}</text>
+            <text fg={theme.text.muted}>{view.open ? "▾" : "▸"}</text>
           </Show>
-          <text fg={theme.text.base}>
-            <b>Todo</b>
-            <Show when={list().length > 2 && !view.open}>
-              <span style={{ fg: theme.text.muted }}> ({remaining()} remaining)</span>
-            </Show>
-          </text>
+          <box flexGrow={1}>
+            <SectionTitle theme={theme} title="Plan" count={`${list().length - remaining()}/${list().length}`} />
+          </box>
         </box>
         <Show when={list().length <= 2 || view.open}>
-          <For each={list()}>{(item) => <TodoItem theme={theme} todo={item} />}</For>
+          <For each={list()}>{(item) => <PlanItem theme={theme} todo={item} />}</For>
         </Show>
       </box>
     </Show>

@@ -62,7 +62,7 @@ test("sidebar shows available context usage", async () => {
 
   try {
     await app.renderOnce()
-    expect(app.captureCharFrame()).toContain("Context")
+    expect(app.captureCharFrame()).toContain("CONTEXT")
     expect(app.captureCharFrame()).toContain("1,234 tokens")
   } finally {
     app.renderer.destroy()

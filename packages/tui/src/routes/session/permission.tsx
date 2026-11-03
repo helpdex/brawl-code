@@ -1,7 +1,7 @@
 import { createStore } from "solid-js/store"
 import { createMemo, For, Match, Show, Switch } from "solid-js"
 import { Portal, useRenderer, useTerminalDimensions, type JSX } from "@opentui/solid"
-import type { TextareaRenderable } from "@opentui/core"
+import { TextAttributes, type TextareaRenderable } from "@opentui/core"
 import { useTheme, useThemes } from "../../context/theme"
 import type { PermissionReply, PermissionRequest } from "@opencode/client"
 import { SplitBorder } from "../../ui/border"
@@ -201,7 +201,13 @@ export function PermissionPrompt(props: { request: PermissionRequest; directory?
             <box flexDirection="column" gap={0}>
               <box flexDirection="row" gap={1} flexShrink={0}>
                 <text fg={theme.text.feedback.warning.base}>{"△"}</text>
-                <text fg={theme.text.base}>Permission required</text>
+                <text fg={theme.text.base} attributes={TextAttributes.BOLD}>
+                  {props.request.action === "shell"
+                    ? "Run command?"
+                    : props.request.action === "edit"
+                      ? "Change file?"
+                      : "Permission required"}
+                </text>
               </box>
               <Show when={props.request.action !== "shell" && current.title}>
                 <box flexDirection="row" gap={1} paddingLeft={2} flexShrink={0}>
@@ -490,6 +496,15 @@ export function SessionQuestion<const T extends Record<string, string>>(props: {
         group: group(),
         run: () => props.onSelect(store.selected),
       },
+      ...keys.map((option, index) => ({
+        bind: String(index + 1),
+        title: "Select option",
+        group: group(),
+        run: () => {
+          setStore("selected", option)
+          props.onSelect(option)
+        },
+      })),
       ...(props.escapeKey ? [{ bind: "escape", title: "Reject permission", group: group(), run: dismiss }] : []),
     ],
     bindings: [...(props.escapeKey ? ["app.exit"] : []), ...(props.fullscreen ? ["permission.prompt.fullscreen"] : [])],
@@ -562,7 +577,7 @@ export function SessionQuestion<const T extends Record<string, string>>(props: {
           flexShrink={0}
         >
           <For each={keys}>
-            {(option) => (
+            {(option, index) => (
               <box
                 id={`${id()}.action.${String(option)}`}
                 ref={SimulationSemantics.bind(() => ({
@@ -589,7 +604,7 @@ export function SessionQuestion<const T extends Record<string, string>>(props: {
                 <text
                   fg={option === store.selected ? theme.text.action.primary.focused : theme.text.action.primary.base}
                 >
-                  {props.options[option]}
+                  <span style={{ bold: true }}>{index() + 1}</span> {props.options[option]}
                 </text>
               </box>
             )}

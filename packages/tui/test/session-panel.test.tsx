@@ -429,7 +429,7 @@ test.each(["none", false] as const)(
 test("Enter in the diff panel cannot approve a pending permission in either presentation", async () => {
   await using state = await tmpdir()
   await using setup = await createSessionFixture(state.path, { permission: true })
-  await setup.waitForFrame((frame) => frame.includes("Permission required"))
+  await setup.waitForFrame((frame) => frame.includes("Run command?"))
   const permissionNode = node(setup, "session.permission")
   setup.mockInput.pressKey("F6")
   await panelReady(setup)

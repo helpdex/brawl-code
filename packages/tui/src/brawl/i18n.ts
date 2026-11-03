@@ -70,6 +70,7 @@ const forms: Readonly<Record<string, readonly [string, string, string]>> = {
   search: ["поиск", "поиска", "поисков"],
   fetch: ["загрузка", "загрузки", "загрузок"],
   step: ["шаг", "шага", "шагов"],
+  line: ["строка", "строки", "строк"],
 }
 
 export function counted(count: number, word: string, english: string, lang = language) {

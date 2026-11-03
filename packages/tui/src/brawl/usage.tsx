@@ -6,6 +6,7 @@ import { useTheme } from "../context/theme"
 import { DialogHeader, DialogLayout } from "../ui/dialog"
 import { Link } from "../ui/link"
 import { useToast } from "../ui/toast"
+import { SectionTitle } from "./session"
 import { brawlText, fullest, windowLevel } from "./usage-text"
 
 const text = brawlText()
@@ -57,10 +58,15 @@ export function SidebarBrawlAccount(props: { account: UsageLimitsBrawl }) {
   const theme = useTheme()
   return (
     <box>
-      <text fg={theme.text.base}>
-        <b>Brawl</b>
-      </text>
-      <Show when={props.account.email}>{(email) => <text fg={theme.text.muted}>{email()}</text>}</Show>
+      <SectionTitle title="Brawl" />
+      <Show when={props.account.email}>
+        {(email) => (
+          <text fg={theme.text.muted} wrapMode="none">
+            <span style={{ fg: theme.text.feedback.success.base }}>● </span>
+            {email()}
+          </text>
+        )}
+      </Show>
       <Show when={fullest(props.account)} fallback={<text fg={theme.text.muted}>{text.plan(props.account.plan)}</text>}>
         {(window) => (
           <text fg={windowColor(window(), theme) ?? theme.text.muted}>

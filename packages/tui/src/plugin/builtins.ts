@@ -14,16 +14,18 @@ import Stats from "../feature-plugins/system/stats"
 import Latex from "@opencode/latex/plugin"
 import Merman from "@opencode/merman/plugin"
 import SidebarBrawl from "../brawl/sidebar"
+import SidebarChanges from "../brawl/sidebar-changes"
 
 export const builtins = [
   HomeFooter,
   PromptFooter,
   PromptBtw,
   SidebarContext,
-  SidebarBrawl,
   SidebarLimit,
-  SidebarMcp,
   SidebarTodo,
+  SidebarChanges,
+  SidebarMcp,
+  SidebarBrawl,
   SidebarFooter,
   Notifications,
   Plugins,

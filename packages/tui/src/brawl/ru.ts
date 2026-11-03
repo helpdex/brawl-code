@@ -92,6 +92,8 @@ export const ru: Readonly<Record<string, string>> = {
   "Toggle answer": "Отметить ответ",
 
   "Permission required": "Нужно разрешение",
+  "Run command?": "Выполнить команду?",
+  "Change file?": "Изменить файл?",
   "Reject permission": "Отклонить",
   "Rejection reason": "Причина отказа",
   "Confirm rejection": "Подтвердить отказ",

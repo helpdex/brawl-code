@@ -135,6 +135,15 @@ import { containsAnchor, createTimelineAnchors, groupID } from "./anchors"
 import { rowsAfter, rowsBefore, rowWeight } from "./mount-budget"
 export { InlineToolRow } from "./message-parts"
 export { toolDisplay } from "./message-parts"
+import {
+  accent as brawlAccent,
+  ChangeCount,
+  changeCountWidth,
+  CommandResult,
+  MoreLines,
+  PREVIEW_LINES as BRAWL_PREVIEW_LINES,
+} from "../../brawl/session"
+import { previewLines, previewPatch } from "../../brawl/session-text"
 
 addDefaultParsers(parsers.parsers)
 
@@ -2878,6 +2887,9 @@ type BlockToolProps = {
   spinner?: boolean
   error?: string
   errorColor?: RGBA
+  icon?: string
+  aside?: JSX.Element
+  asideWidth?: number
 }
 
 function BlockTool(props: BlockToolProps) {
@@ -2938,9 +2950,15 @@ function BlockTool(props: BlockToolProps) {
               fallback={
                 <text
                   flexShrink={0}
-                  fg={permission() ? theme.text.feedback.warning.base : (props.headerColor ?? theme.text.muted)}
+                  fg={
+                    permission()
+                      ? theme.text.feedback.warning.base
+                      : props.icon
+                        ? brawlAccent(theme)
+                        : (props.headerColor ?? theme.text.muted)
+                  }
                 >
-                  {path().label}
+                  {props.icon ?? path().label}
                 </text>
               }
             >
@@ -2950,9 +2968,28 @@ function BlockTool(props: BlockToolProps) {
             </Show>
             <FilePath
               value={path().value}
-              maxWidth={Math.max(2, ctx.width - 4 - stringWidth(path().label) - (props.spinner ? 2 : 0))}
-              fg={permission() ? theme.text.feedback.warning.base : (props.headerColor ?? theme.text.muted)}
+              maxWidth={Math.max(
+                2,
+                ctx.width -
+                  4 -
+                  stringWidth(props.icon && !props.spinner ? props.icon : path().label) -
+                  (props.spinner ? 2 : 0) -
+                  (props.asideWidth ?? 0),
+              )}
+              fg={
+                permission()
+                  ? theme.text.feedback.warning.base
+                  : props.icon
+                    ? theme.text.base
+                    : (props.headerColor ?? theme.text.muted)
+              }
             />
+            <Show when={props.aside}>
+              <box flexGrow={1} />
+              <box flexShrink={0} paddingRight={3}>
+                {props.aside}
+              </box>
+            </Show>
           </box>
         )}
       </Show>
@@ -3084,6 +3121,14 @@ function ShellDisplay(props: {
   const limitedInput = createMemo(() => (expanded() ? input() : collapsed().input))
   const limitedOutput = createMemo(() => (expanded() ? output() : collapsed().output))
   const expandable = createMemo(() => Boolean(props.shellID) || collapsed().overflow)
+  const result = createMemo(() => {
+    const part = props.part
+    if (!part || isRunning() || part.state.status !== "completed" || props.background) return
+    const exit = finiteNumber(part.state.metadata?.exit)
+    if (exit === undefined) return
+    const end = part.time.completed
+    return { exit, duration: end === undefined ? undefined : Locale.duration(Math.max(0, end - part.time.created)) }
+  })
   const toggle = () => {
     const next = !expanded()
     setExpanded(next)
@@ -3106,13 +3151,18 @@ function ShellDisplay(props: {
           <Show
             when={isRunning()}
             fallback={
-              <text
-                fg={theme.text.base}
-                wrapMode={expanded() ? "word" : "char"}
-                maxHeight={expanded() ? undefined : 2}
-              >
-                {limitedInput()}
-              </text>
+              <box flexDirection="row" gap={2}>
+                <text
+                  fg={theme.text.base}
+                  wrapMode={expanded() ? "word" : "char"}
+                  maxHeight={expanded() ? undefined : 2}
+                  flexGrow={1}
+                  minWidth={0}
+                >
+                  {limitedInput()}
+                </text>
+                <Show when={result()}>{(value) => <CommandResult {...value()} />}</Show>
+              </box>
             }
           >
             <box flexDirection="row" gap={1}>
@@ -3147,6 +3197,9 @@ function Write(props: ToolProps) {
   const code = createMemo(() => {
     return stringValue(props.input.content) ?? ""
   })
+  const [expanded, setExpanded] = createSignal(false)
+  const preview = createMemo(() => previewLines(code(), BRAWL_PREVIEW_LINES))
+  const lines = createMemo(() => (code() ? code().replace(/\n$/, "").split("\n").length : 0))
 
   return (
     <Switch>
@@ -3154,6 +3207,9 @@ function Write(props: ToolProps) {
         <BlockTool
           path={{ label: "# Wrote", value: pathFormatter.format(stringValue(props.input.path)) }}
           part={props.part}
+          icon="✎"
+          aside={<ChangeCount additions={lines()} deletions={0} />}
+          asideWidth={String(lines()).length + 5}
         >
           <line_number fg={theme.text.muted} minWidth={3} paddingRight={1}>
             <code
@@ -3161,9 +3217,10 @@ function Write(props: ToolProps) {
               fg={theme.text.base}
               filetype={filetype(stringValue(props.input.path))}
               syntaxStyle={syntax()}
-              content={code()}
+              content={expanded() ? code() : preview().text}
             />
           </line_number>
+          <MoreLines hidden={preview().hidden} expanded={expanded()} onToggle={() => setExpanded((value) => !value)} />
           <Diagnostics diagnostics={props.metadata.diagnostics} filePath={stringValue(props.input.path) ?? ""} />
         </BlockTool>
       </Match>
@@ -3452,15 +3509,23 @@ function Edit(props: ToolProps) {
 
   const file = createMemo(() => parseApplyPatchFiles(props.metadata.files)[0])
   const path = createMemo(() => file()?.relativePath ?? stringValue(props.input.path))
+  const [expanded, setExpanded] = createSignal(false)
+  const preview = createMemo(() => previewPatch(file()?.patch ?? "", BRAWL_PREVIEW_LINES))
 
   return (
     <Switch>
       <Match when={file()}>
         {(item) => (
-          <BlockTool path={{ label: "← Edit", value: pathFormatter.format(path()) }} part={props.part}>
+          <BlockTool
+            path={{ label: "← Edit", value: pathFormatter.format(path()) }}
+            part={props.part}
+            icon="✎"
+            aside={<ChangeCount additions={item().additions} deletions={item().deletions} />}
+            asideWidth={changeCountWidth(item()) + 4}
+          >
             <box paddingLeft={1} paddingRight={3}>
               <PatchDiff
-                diff={item().patch}
+                diff={expanded() ? item().patch : preview().patch}
                 hunkFg={theme.diff.text.hunkHeader}
                 view={view()}
                 filetype={filetype(path())}
@@ -3480,6 +3545,11 @@ function Edit(props: ToolProps) {
                 removedLineNumberBg={theme.diff.lineNumber.background.removed}
               />
             </box>
+            <MoreLines
+              hidden={preview().hidden}
+              expanded={expanded()}
+              onToggle={() => setExpanded((value) => !value)}
+            />
             <Diagnostics diagnostics={props.metadata.diagnostics} filePath={stringValue(props.input.path) ?? ""} />
           </BlockTool>
         )}
@@ -3532,47 +3602,59 @@ function ApplyPatch(props: ToolProps) {
       <Match when={files().length > 0}>
         <box flexDirection="column" gap={1}>
           <For each={files()}>
-            {(file) => (
-              <BlockTool
-                path={{
-                  label: file.type === "add" ? "# Created" : file.type === "delete" ? "# Deleted" : "← Patched",
-                  value: pathFormatter.format(file.relativePath),
-                }}
-                part={props.part}
-              >
-                <Show
-                  when={file.type !== "delete"}
-                  fallback={
-                    <text fg={theme.diff.text.removed}>
-                      -{file.deletions} line{file.deletions !== 1 ? "s" : ""}
-                    </text>
-                  }
+            {(file) => {
+              const [expanded, setExpanded] = createSignal(false)
+              const preview = previewPatch(file.patch, BRAWL_PREVIEW_LINES)
+              return (
+                <BlockTool
+                  path={{
+                    label: file.type === "add" ? "# Created" : file.type === "delete" ? "# Deleted" : "← Patched",
+                    value: pathFormatter.format(file.relativePath),
+                  }}
+                  part={props.part}
+                  icon={file.type === "update" ? "✎" : undefined}
+                  aside={<ChangeCount additions={file.additions} deletions={file.deletions} />}
+                  asideWidth={changeCountWidth(file) + 4}
                 >
-                  <box paddingLeft={1} paddingRight={3}>
-                    <PatchDiff
-                      diff={file.patch}
-                      hunkFg={theme.diff.text.hunkHeader}
-                      view={view()}
-                      filetype={filetype(file.relativePath)}
-                      syntaxStyle={syntax()}
-                      showLineNumbers={true}
-                      width="100%"
-                      wrapMode={ctx.diffWrapMode()}
-                      fg={theme.text.base}
-                      addedBg={theme.diff.background.added}
-                      removedBg={theme.diff.background.removed}
-                      contextBg={theme.diff.background.context}
-                      addedSignColor={theme.diff.highlight.added}
-                      removedSignColor={theme.diff.highlight.removed}
-                      lineNumberFg={theme.diff.lineNumber.text}
-                      lineNumberBg={theme.diff.background.context}
-                      addedLineNumberBg={theme.diff.lineNumber.background.added}
-                      removedLineNumberBg={theme.diff.lineNumber.background.removed}
+                  <Show
+                    when={file.type !== "delete"}
+                    fallback={
+                      <text fg={theme.diff.text.removed}>
+                        -{file.deletions} line{file.deletions !== 1 ? "s" : ""}
+                      </text>
+                    }
+                  >
+                    <box paddingLeft={1} paddingRight={3}>
+                      <PatchDiff
+                        diff={expanded() ? file.patch : preview.patch}
+                        hunkFg={theme.diff.text.hunkHeader}
+                        view={view()}
+                        filetype={filetype(file.relativePath)}
+                        syntaxStyle={syntax()}
+                        showLineNumbers={true}
+                        width="100%"
+                        wrapMode={ctx.diffWrapMode()}
+                        fg={theme.text.base}
+                        addedBg={theme.diff.background.added}
+                        removedBg={theme.diff.background.removed}
+                        contextBg={theme.diff.background.context}
+                        addedSignColor={theme.diff.highlight.added}
+                        removedSignColor={theme.diff.highlight.removed}
+                        lineNumberFg={theme.diff.lineNumber.text}
+                        lineNumberBg={theme.diff.background.context}
+                        addedLineNumberBg={theme.diff.lineNumber.background.added}
+                        removedLineNumberBg={theme.diff.lineNumber.background.removed}
+                      />
+                    </box>
+                    <MoreLines
+                      hidden={preview.hidden}
+                      expanded={expanded()}
+                      onToggle={() => setExpanded((value) => !value)}
                     />
-                  </box>
-                </Show>
-              </BlockTool>
-            )}
+                  </Show>
+                </BlockTool>
+              )
+            }}
           </For>
         </box>
       </Match>

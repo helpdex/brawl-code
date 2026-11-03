@@ -1,6 +1,9 @@
 import { Plugin } from "@opencode/plugin/tui"
 import { createMemo, Show } from "solid-js"
 import { contextUsage } from "../../util/session"
+import { Meter, SectionTitle } from "../../brawl/session"
+import { contextLine } from "../../brawl/session-text"
+import { SESSION_SIDEBAR_WIDTH } from "../../ui/layout"
 
 const money = new Intl.NumberFormat("en-US", {
   style: "currency",
@@ -20,16 +23,14 @@ export function SidebarContext(props: { context: Plugin.Context; sessionID: stri
   return (
     <Show when={state() || cost() > 0}>
       <box>
-        <text fg={theme.text.base}>
-          <b>Context</b>
-        </text>
+        <SectionTitle theme={theme} title="Context" />
         <Show when={state()}>
           {(value) => (
             <>
-              <text fg={theme.text.muted}>{value().tokens.toLocaleString()} tokens</text>
-              <Show when={value().percent !== undefined}>
-                <text fg={theme.text.muted}>{value().percent}% used</text>
+              <Show when={value().limit}>
+                <Meter theme={theme} percent={value().percent ?? 0} width={SESSION_SIDEBAR_WIDTH - 6} />
               </Show>
+              <text fg={theme.text.muted}>{contextLine(value())}</text>
             </>
           )}
         </Show>
