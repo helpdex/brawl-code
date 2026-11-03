@@ -21,20 +21,20 @@ import { testEffect } from "../../core/test/lib/effect"
 const it = testEffect(NodeFileSystem.layer)
 
 test("managed service ports are stable per installation channel", () => {
-  expect(ServiceConfig.defaultPort("latest", "linux")).toBe(0xc0de)
-  expect(ServiceConfig.defaultPort("dev", "linux")).toBe(0xc0de)
-  expect(ServiceConfig.defaultPort("beta", "linux")).toBe(0xc0de)
-  expect(ServiceConfig.defaultPort("next", "linux")).toBe(0xc0de)
-  expect(ServiceConfig.defaultPort("local", "linux")).toBe(0xc0df)
-  expect(ServiceConfig.defaultPort("latest", "darwin")).toBe(0xc0de)
+  expect(ServiceConfig.defaultPort("latest", "linux")).toBe(0xb7a1)
+  expect(ServiceConfig.defaultPort("dev", "linux")).toBe(0xb7a1)
+  expect(ServiceConfig.defaultPort("beta", "linux")).toBe(0xb7a1)
+  expect(ServiceConfig.defaultPort("next", "linux")).toBe(0xb7a1)
+  expect(ServiceConfig.defaultPort("local", "linux")).toBe(0xb7a2)
+  expect(ServiceConfig.defaultPort("latest", "darwin")).toBe(0xb7a1)
   expect(ServiceConfig.defaultPort("preview-a", "linux")).toBe(ServiceConfig.defaultPort("preview-a", "linux"))
   expect(ServiceConfig.defaultPort("preview-a", "linux")).not.toBe(ServiceConfig.defaultPort("preview-b", "linux"))
 })
 
 test("managed service ports on Windows stay below the ranges Windows and WSL reserve", () => {
-  expect(ServiceConfig.defaultPort("latest", "win32")).toBe(0x70de)
-  expect(ServiceConfig.defaultPort("dev", "win32")).toBe(0x70de)
-  expect(ServiceConfig.defaultPort("local", "win32")).toBe(0x70df)
+  expect(ServiceConfig.defaultPort("latest", "win32")).toBe(0x77a1)
+  expect(ServiceConfig.defaultPort("dev", "win32")).toBe(0x77a1)
+  expect(ServiceConfig.defaultPort("local", "win32")).toBe(0x77a2)
   const ports = Array.from({ length: 200 }, (_, index) => ({
     windows: ServiceConfig.defaultPort(`preview-${index}`, "win32"),
     linux: ServiceConfig.defaultPort(`preview-${index}`, "linux"),
