@@ -2,6 +2,7 @@ export * as App from "./app.js"
 
 import { Context, Layer } from "effect"
 import { makeGlobalNode } from "@opencode/util/effect/app-node"
+import { Brawl } from "@opencode/util/brawl"
 
 export interface Info {
   readonly name: string
@@ -22,7 +23,7 @@ export function make(input: Partial<Info> = {}): Info {
 }
 
 export function useragent(app: Info) {
-  return `opencode/${app.channel}/${app.version}/${app.name}`
+  return `${Brawl.command}/${app.channel}/${app.version}/${app.name}`
 }
 
 export const layer = (input?: Partial<Info>) => Layer.succeed(Metadata, make(input))

@@ -14,10 +14,7 @@ export default Runtime.handler(
       intro("Upgrade")
       const updater = yield* Updater.Service
       const method = Option.getOrUndefined(input.method) ?? (yield* updater.method())
-      if (!method)
-        return yield* Effect.fail(
-          new Error("Could not detect the installation method. Pass --method to choose how to upgrade OpenCode."),
-        )
+      if (!method) return yield* Effect.fail(new Error(Updater.unavailable))
 
       log.info(`Using method: ${method}`)
       const target = Option.getOrUndefined(input.target) ?? (yield* updater.latest(method))

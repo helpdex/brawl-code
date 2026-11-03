@@ -5,6 +5,7 @@ import path from "path"
 import { Effect } from "effect"
 import { FSUtil } from "@opencode/util/fs-util"
 import { Global } from "@opencode/util/global"
+import { Brawl } from "@opencode/util/brawl"
 import { Location } from "../location.js"
 import { AbsolutePath } from "../schema.js"
 import type { Options } from "../config.js"
@@ -24,18 +25,18 @@ export interface Sources {
   readonly agents: readonly AbsolutePath[]
 }
 
-/** Platform system configuration directory (`/Library/Application Support/opencode`, `/etc/opencode`, `%ProgramData%\opencode`). */
+/** Platform system configuration directory (`/Library/Application Support/brawl-code`, `/etc/brawl-code`, `%ProgramData%\brawl-code`). */
 export function systemDirectory(platform: NodeJS.Platform = process.platform, env: NodeJS.ProcessEnv = process.env) {
-  if (platform === "darwin") return AbsolutePath.make("/Library/Application Support/opencode")
-  if (platform === "win32") return AbsolutePath.make(path.join(env.ProgramData || "C:\\ProgramData", "opencode"))
-  return AbsolutePath.make("/etc/opencode")
+  if (platform === "darwin") return AbsolutePath.make(`/Library/Application Support/${Brawl.app}`)
+  if (platform === "win32") return AbsolutePath.make(path.join(env.ProgramData || "C:\\ProgramData", Brawl.app))
+  return AbsolutePath.make(`/etc/${Brawl.app}`)
 }
 
 /** macOS MDM managed preferences plists, most specific first; the first one present wins. */
 export function preferencePaths(user: string) {
   return [
-    AbsolutePath.make(path.join("/Library/Managed Preferences", user, "ai.opencode.managed.plist")),
-    AbsolutePath.make("/Library/Managed Preferences/ai.opencode.managed.plist"),
+    AbsolutePath.make(path.join("/Library/Managed Preferences", user, "io.brawl.code.managed.plist")),
+    AbsolutePath.make("/Library/Managed Preferences/io.brawl.code.managed.plist"),
   ]
 }
 

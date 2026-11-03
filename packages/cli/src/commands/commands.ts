@@ -2,6 +2,7 @@ import { Argument, Flag, GlobalFlag } from "effect/cli"
 import { Schema } from "effect"
 import { Spec } from "../framework/spec"
 import { Updater } from "../services/updater"
+import { Brawl } from "@opencode/util/brawl"
 
 export const PrintLogs = GlobalFlag.Setting("print-logs")({
   flag: Flag.Boolean("print-logs").pipe(
@@ -45,13 +46,13 @@ const PermissionParams = {
   ),
 }
 
-const Root = Spec.make(typeof OPENCODE_CLI_NAME === "string" ? OPENCODE_CLI_NAME : "opencode", {
-  description: "OpenCode command line interface",
+const Root = Spec.make(typeof OPENCODE_CLI_NAME === "string" ? OPENCODE_CLI_NAME : Brawl.command, {
+  description: `${Brawl.name} command line interface`,
   params: {
     ...ServerParams,
     ...PermissionParams,
     directory: Argument.String("directory").pipe(
-      Argument.withDescription("Directory to start OpenCode in"),
+      Argument.withDescription(`Directory to start ${Brawl.name} in`),
       Argument.optional,
     ),
     continue: Flag.Boolean("continue").pipe(

@@ -1,4 +1,5 @@
 import { Global } from "@opencode/util/global"
+import { Brawl } from "@opencode/util/brawl"
 import { AppProcess } from "@opencode/util/process"
 import { EffectFlock } from "@opencode/util/effect-flock"
 import { OPENCODE_ARTIFACT, OPENCODE_CHANNEL, OPENCODE_LOCAL, OPENCODE_VERSION } from "../version"
@@ -623,6 +624,20 @@ const make = Effect.gen(function* () {
 })
 
 export const layer = Layer.effect(Service, make)
+
+export const unavailable = `${Brawl.name} cannot update itself yet: install the new version from ${Brawl.site}.`
+export const disabled = Layer.succeed(
+  Service,
+  Service.of({
+    run: () => Effect.succeed(undefined),
+    check: () => Effect.succeed({ type: "unavailable", message: unavailable }),
+    apply: () => Effect.fail(new Error(unavailable)),
+    method: () => Effect.succeed(undefined),
+    latest: () => Effect.fail(new Error(unavailable)),
+    upgrade: () => Effect.fail(new Error(unavailable)),
+    removal: () => undefined,
+  }),
+)
 
 export * as Updater from "./updater"
 export { action, type Action, type Policy } from "./updater-action"
