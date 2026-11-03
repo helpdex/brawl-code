@@ -124,6 +124,7 @@ describe("BrawlPlugin", () => {
       expect(yield* providers.get(Provider.ID.opencode)).toBeUndefined()
       const integrations = yield* Integration.Service
       expect(yield* integrations.get(Integration.ID.make("opencode"))).toBeUndefined()
+      expect(yield* integrations.get(Integration.ID.make("opencode-go"))).toBeUndefined()
     }),
   )
 

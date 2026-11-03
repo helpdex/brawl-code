@@ -47,8 +47,7 @@ import {
 } from "../util/form"
 
 const INTEGRATION_PRIORITY: Record<string, number> = {
-  opencode: 0,
-  "opencode-go": 1,
+  brawl: 0,
   openai: 2,
   "github-copilot": 3,
   anthropic: 4,

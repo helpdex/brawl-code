@@ -43,11 +43,13 @@ export function ErrorComponent(props: { error: Error; reset: () => void; mode?: 
 
   const message = props.error.message || "An unknown error occurred."
   const stack = props.error.stack || "No stack trace available."
-  const issueURL = buildIssueURL(message, stack, app.version)
+  const report = [`Brawl Code ${app.version}, ${describeOS()}, ${describeTerminal()}`, "", message, "", stack].join(
+    "\n",
+  )
 
   const copyReport = () => {
     void clipboard
-      .write(issueURL.toString())
+      .write(report)
       .then(() => setCopyState("copied"))
       .catch(() => setCopyState("failed"))
   }
@@ -117,7 +119,7 @@ export function ErrorComponent(props: { error: Error; reset: () => void; mode?: 
         {/* Headline */}
         <box flexDirection="column" alignItems="center" flexShrink={0}>
           <text attributes={TextAttributes.BOLD} fg={colors.text}>
-            OpenCode crashed
+            Brawl Code crashed
           </text>
           <Show when={showSubtext()}>
             <text fg={colors.muted}>An unexpected error stopped the session.</text>
@@ -205,54 +207,15 @@ export function ErrorComponent(props: { error: Error; reset: () => void; mode?: 
           <box flexDirection="column" alignItems="center" flexShrink={0}>
             <text fg={colors.muted}>
               {copyState() === "copied"
-                ? "Report copied — paste it into a new GitHub issue."
+                ? "Report copied: send it to Brawl with what you were doing."
                 : copyState() === "failed"
-                  ? "Clipboard write failed. Try again or report the crash manually."
-                  : "Copy the report and open a GitHub issue to help us fix this."}
+                  ? "Clipboard write failed. Try again or copy the error by hand."
+                  : "Copy the report and send it to Brawl to help fix this."}
             </text>
-            <text fg={colors.muted}>OpenCode {app.version}</text>
+            <text fg={colors.muted}>Brawl Code {app.version}</text>
           </box>
         </Show>
       </box>
     </box>
   )
-}
-
-function buildIssueURL(message: string, stack: string, version: string) {
-  // Field keys match the ids in .github/ISSUE_TEMPLATE/bug-report.yml so the issue
-  // form opens pre-filled. Populating os/terminal/reproduce keeps the report past
-  // the contributing-guidelines compliance check, which pushes for system info.
-  const url = new URL("https://github.com/anomalyco/opencode/issues/new?template=bug-report.yml")
-  url.searchParams.set("title", `TUI crash: ${message}`)
-  url.searchParams.set("opencode-version", version)
-  url.searchParams.set("os", describeOS())
-  url.searchParams.set("terminal", describeTerminal())
-  url.searchParams.set(
-    "reproduce",
-    "Reported automatically from the OpenCode crash screen. If you can, describe what you were doing when it crashed.",
-  )
-
-  // Budget the stack against the fully URL-encoded length (not the raw length) so
-  // the final link stays under GitHub's practical limit; flag truncation so a
-  // clipped trace is obvious. searchParams.set handles encoding without throwing,
-  // so measuring url.toString() is both correct and safe on any input.
-  const MAX_URL_LENGTH = 6000
-  const marker = "\n… (truncated)"
-  const head = `The OpenCode TUI crashed with an unexpected error.\n\n**Error:** ${message}\n\n**Stack trace:**\n`
-  const setBody = (body: string) => url.searchParams.set("description", head + "```\n" + body + "\n```")
-
-  setBody(stack)
-  if (url.toString().length <= MAX_URL_LENGTH) return url
-
-  // Largest raw stack prefix whose encoded URL (with the marker) still fits.
-  let lo = 0
-  let hi = stack.length
-  while (lo < hi) {
-    const mid = Math.ceil((lo + hi) / 2)
-    setBody(stack.slice(0, mid) + marker)
-    if (url.toString().length <= MAX_URL_LENGTH) lo = mid
-    else hi = mid - 1
-  }
-  setBody(stack.slice(0, lo) + marker)
-  return url
 }

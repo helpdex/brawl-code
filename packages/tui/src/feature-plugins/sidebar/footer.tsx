@@ -54,10 +54,8 @@ export function SidebarOnboarding(props: { context: Plugin.Context; sessionID: s
               ✕
             </text>
           </box>
-          <text fg={props.context.theme.text.muted}>OpenCode includes free models so you can start immediately.</text>
-          <text fg={props.context.theme.text.muted}>
-            Connect from 75+ providers to use other models, including Claude, GPT, Gemini etc
-          </text>
+          <text fg={props.context.theme.text.muted}>Sign in to your Brawl account to start.</text>
+          <text fg={props.context.theme.text.muted}>Other providers work too: Claude, GPT, Gemini and 75+ more</text>
           <box
             id="sidebar.footer.getting-started.connect"
             flexDirection="row"

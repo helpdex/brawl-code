@@ -121,6 +121,7 @@ export const Plugin = define<Bus.Service | Config.Service | Scope.Scope>({
 
     yield* ctx.integration.transform((editor) => {
       editor.remove("opencode")
+      editor.remove("opencode-go")
       editor.update(Brawl.id, (integration) => {
         integration.name = account
       })
