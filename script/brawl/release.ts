@@ -57,6 +57,12 @@ const binaries = (await readdir(build, { recursive: true }))
 if (!binaries.length || (targets && binaries.length !== targets.length))
   throw new Error(`Expected ${targets?.length ?? "all"} binaries in ${build}, found ${binaries.length}`)
 
+for (const { target, file } of binaries.filter((item) => item.target.startsWith("darwin-"))) {
+  if (process.platform !== "darwin") throw new Error(`${target} needs codesign: build the release on macOS`)
+  await $`codesign --force --sign - --identifier brawl-code ${file}`.quiet()
+  await $`codesign --verify --strict ${file}`
+}
+
 await mkdir(out, { recursive: true })
 const files = await Promise.all(
   binaries.map(async ({ target, file }) => {
