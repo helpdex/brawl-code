@@ -58,7 +58,7 @@ describe("upgrade command", () => {
     const result = await cli([], { UPGRADE_TEST_METHOD: "unknown" })
     expect(result.exitCode).toBe(1)
     expect(result.events).toEqual(["method"])
-    expect(result.stdout).toContain("cannot update itself yet")
+    expect(result.stdout).toContain("updates itself when brawl code installed it")
   })
 
   test("rejects unsupported methods before attempting an upgrade", async () => {

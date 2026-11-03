@@ -3,6 +3,8 @@ import { Effect, Option } from "effect"
 import { Commands } from "../commands"
 import { Runtime } from "../../framework/runtime"
 import { Updater } from "../../services/updater"
+import { BrawlUpdater } from "../../brawl/updater"
+import { Brawl } from "@opencode/util/brawl"
 import { handlePromptErrors } from "../../ui/prompt"
 import { OPENCODE_VERSION } from "../../version"
 import { stripVTControlCharacters } from "node:util"
@@ -14,13 +16,13 @@ export default Runtime.handler(
       intro("Upgrade")
       const updater = yield* Updater.Service
       const method = Option.getOrUndefined(input.method) ?? (yield* updater.method())
-      if (!method) return yield* Effect.fail(new Error(Updater.unavailable))
+      if (!method) return yield* Effect.fail(new Error(BrawlUpdater.unmanaged))
 
       log.info(`Using method: ${method}`)
       const target = Option.getOrUndefined(input.target) ?? (yield* updater.latest(method))
       const version = target.trim().replace(/^v/, "")
       if (version === OPENCODE_VERSION) {
-        log.warn(`OpenCode upgrade skipped: ${version} is already installed`)
+        log.warn(`${Brawl.name} upgrade skipped: ${version} is already installed`)
         outro("Done")
         return
       }

@@ -1,6 +1,7 @@
 import { confirm, intro, log, outro, spinner } from "@clack/prompts"
 import { Service } from "@opencode/client/effect/service"
 import { Global } from "@opencode/util/global"
+import { Brawl } from "@opencode/util/brawl"
 import { Effect, FileSystem, Schedule } from "effect"
 import path from "node:path"
 import { Commands } from "../commands"
@@ -14,7 +15,7 @@ import { errorMessage } from "../../util/error"
 export default Runtime.handler(
   Commands.commands.uninstall,
   Effect.fn("cli.uninstall")(function* (input) {
-    intro("Uninstall OpenCode")
+    intro(`Uninstall ${Brawl.name}`)
     const fs = yield* FileSystem.FileSystem
     const global = yield* Global.Service
     const updater = yield* Updater.Service
@@ -29,14 +30,14 @@ export default Runtime.handler(
     const shell = method === "curl" ? yield* shellConfigs(global.home) : []
 
     log.info(`Installation method: ${method ?? "unknown"}`)
-    log.message("The following global files will be removed (shared by OpenCode versions and channels):")
+    log.message(`The following global files will be removed (shared by ${Brawl.name} versions and channels):`)
     if (yield* fs.exists(global.cache)) log.info(`  Cache: ${global.cache}`)
     services.forEach((name) =>
       log.info(`  Stop background service and persistent terminals: ${path.join(global.state, name)}`),
     )
     shell.forEach((file) => log.info(`  Shell PATH: ${file}`))
     if (removal) log.info(`  Package: ${removal.command.join(" ")}`)
-    if (method === "curl") log.info(`  Binary (manual removal): ${process.execPath}`)
+    if (method === "curl" || method === "brawl") log.info(`  Binary (manual removal): ${process.execPath}`)
     if (!method) log.warn("Could not detect the installation method. Remove the installation manually after cleanup.")
 
     if (input.dryRun) {
@@ -108,7 +109,7 @@ export default Runtime.handler(
         ),
       )
     }
-    if (method === "curl") {
+    if (method === "curl" || method === "brawl") {
       log.message("To finish removing the binary, run:")
       log.info(`  rm '${process.execPath.replaceAll("'", "'\\''")}'`)
     }

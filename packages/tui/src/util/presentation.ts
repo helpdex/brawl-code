@@ -33,10 +33,13 @@ export function epilogue(input: { readonly session?: SessionEpilogue; readonly u
     ...wordmark("  "),
     "",
     ...(input.updatedVersion
-      ? [`  ${dim}Run ${reset}${bold}opencode${reset}${dim} to use ${reset}${bold}${input.updatedVersion}${reset}`, ""]
+      ? [
+          `  ${dim}Run ${reset}${bold}brawl-code${reset}${dim} to use ${reset}${bold}${input.updatedVersion}${reset}`,
+          "",
+        ]
       : []),
     ...(input.session
-      ? [row("Session", input.session.title), row("Continue", `opencode -s ${input.session.sessionID}`), ""]
+      ? [row("Session", input.session.title), row("Continue", `brawl-code -s ${input.session.sessionID}`), ""]
       : []),
   ].join("\n")
 }

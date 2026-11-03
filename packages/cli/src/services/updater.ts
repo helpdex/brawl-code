@@ -1,5 +1,4 @@
 import { Global } from "@opencode/util/global"
-import { Brawl } from "@opencode/util/brawl"
 import { AppProcess } from "@opencode/util/process"
 import { EffectFlock } from "@opencode/util/effect-flock"
 import { OPENCODE_ARTIFACT, OPENCODE_CHANNEL, OPENCODE_LOCAL, OPENCODE_VERSION } from "../version"
@@ -12,7 +11,7 @@ import { RetainedImage } from "./retained-image"
 import { action, parseReleaseVersion, type Policy } from "./updater-action"
 import { errorMessage } from "../util/error"
 
-export const methods = ["curl", "npm", "pnpm", "bun", "yarn", "vp", "brew", "winget"] as const
+export const methods = ["curl", "npm", "pnpm", "bun", "yarn", "vp", "brew", "winget", "brawl"] as const
 
 export type Method = (typeof methods)[number]
 export type RunResult = { readonly type: "available" | "installed"; readonly version: string }
@@ -55,6 +54,7 @@ const installNames: Record<Method, string> = {
   vp: "Vite+",
   brew: "Homebrew",
   winget: "WinGet",
+  brawl: "brawl code",
 }
 
 const wingetPackage = "Anomaly.OpenCode"
@@ -247,7 +247,7 @@ const make = Effect.gen(function* () {
 
   const removalCommand = (method: Method) => {
     if (method === "winget") return ["winget", "uninstall", ...wingetArgs]
-    if (method === "curl" || method === "brew" || !installedPackage) return undefined
+    if (method === "curl" || method === "brew" || method === "brawl" || !installedPackage) return undefined
     const commands = {
       npm: ["npm", "uninstall", "--global", installedPackage],
       pnpm: ["pnpm", "remove", "--global", installedPackage],
@@ -437,6 +437,7 @@ const make = Effect.gen(function* () {
       return yield* Effect.fail(new Error(`Reinstall ${target} with ${method} to migrate from ${installedPackage}.`))
     }
     const commands: Record<Exclude<Method, "bun" | "curl" | "brew" | "winget">, string[]> = {
+      brawl: ["brawl", "code"],
       // Keep the old package: uninstalling it can unlink the replacement command.
       npm: [
         "npm",
@@ -624,20 +625,6 @@ const make = Effect.gen(function* () {
 })
 
 export const layer = Layer.effect(Service, make)
-
-export const unavailable = `${Brawl.name} cannot update itself yet: install the new version from ${Brawl.site}.`
-export const disabled = Layer.succeed(
-  Service,
-  Service.of({
-    run: () => Effect.succeed(undefined),
-    check: () => Effect.succeed({ type: "unavailable", message: unavailable }),
-    apply: () => Effect.fail(new Error(unavailable)),
-    method: () => Effect.succeed(undefined),
-    latest: () => Effect.fail(new Error(unavailable)),
-    upgrade: () => Effect.fail(new Error(unavailable)),
-    removal: () => undefined,
-  }),
-)
 
 export * as Updater from "./updater"
 export { action, type Action, type Policy } from "./updater-action"
