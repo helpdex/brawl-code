@@ -12,6 +12,9 @@ const english = {
   "error.page.report.discord": "at brawl.io",
   "dialog.provider.opencode.note": "Brawl Code 1.0 with 262K and 1M context",
   "settings.about.typeset": "Typeset in Inter and JetBrains Mono",
+  "settings.general.row.interfaceMode.inbox": "Projects",
+  "settings.general.row.interfaceMode.inbox.description":
+    "Projects and their sessions in a sidebar, with what each is doing.",
 }
 
 const russian = {
@@ -24,6 +27,9 @@ const russian = {
   "error.page.report.discord": "на brawl.io",
   "dialog.provider.opencode.note": "Brawl Code 1.0 с контекстом 262K и 1M",
   "settings.about.typeset": "Набрано шрифтами Inter и JetBrains Mono",
+  "settings.general.row.interfaceMode.inbox": "Проекты",
+  "settings.general.row.interfaceMode.inbox.description":
+    "Проекты и их сессии в боковой панели, у каждой видно, что она делает.",
 }
 
 const wording = new Map<string, Readonly<Record<string, string>>>([
@@ -39,6 +45,8 @@ const required = [
   "error.page.report.discord",
   "dialog.provider.opencode.note",
   "settings.about.typeset",
+  "settings.general.row.interfaceMode.inbox",
+  "settings.general.row.interfaceMode.inbox.description",
 ] as const satisfies ReadonlyArray<keyof typeof english>
 
 export function brand<Dictionary extends Readonly<Record<string, string>>>(

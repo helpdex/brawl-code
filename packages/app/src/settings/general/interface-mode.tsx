@@ -1,4 +1,4 @@
-import { For, Match, Show, Switch, createUniqueId } from "solid-js"
+import { For, Match, Switch, createUniqueId } from "solid-js"
 import { useLanguage } from "@/runtime/i18n/language"
 import { type TabLayout, useSettings } from "@/settings/model"
 import "./interface-mode.css"
@@ -49,11 +49,6 @@ export function InterfaceModeSetting() {
               <span data-slot="interface-mode-title">
                 <span data-slot="interface-mode-radio" />
                 <span id={`${id}-${mode.id}-title`}>{language.t(`settings.general.row.interfaceMode.${mode.id}`)}</span>
-                <Show when={mode.id === "inbox"}>
-                  <span data-slot="interface-mode-badge">
-                    {language.t("settings.general.row.interfaceMode.experimental")}
-                  </span>
-                </Show>
               </span>
               <span id={`${id}-${mode.id}`} data-slot="interface-mode-description">
                 {language.t(`settings.general.row.interfaceMode.${mode.id}.description`)}

@@ -17,7 +17,8 @@ import { WindowsAppMenu } from "./windows-menu"
 import { applyPath, backPath, forwardPath, type HistoryLocation } from "./history"
 import { TitlebarTabStrip } from "@/shell/titlebar/tab-strip"
 import { macVerticalTrafficLights, SidebarToggle } from "@/shell/sidebar-toggle"
-import { SidebarInbox } from "@/shell/titlebar/inbox"
+import { BrawlSidebar } from "@/brawl/sidebar"
+import { Logo } from "@opencode/ui/logo"
 import { makeEventListener } from "@solid-primitives/event-listener"
 import { createMediaQuery } from "@solid-primitives/media"
 import { readSessionTabsRemovedDetail, SESSION_TABS_REMOVED_EVENT } from "@/shell/titlebar/session-events"
@@ -129,7 +130,7 @@ export function Titlebar(props: { verticalTabs?: { mount?: HTMLElement } }) {
 
   const titlebarItems = useTitlebarItems()
   const hideVerticalTitlebar = createMemo(() => !!props.verticalTabs && !windows())
-  const homeInSidebarHeader = () => !windows() && !macTrafficLights()
+  const homeInSidebarHeader = () => !windows() && !macTrafficLights() && settings.appearance.tabLayout() !== "inbox"
 
   const back = () => {
     const next = backPath(history)
@@ -842,7 +843,16 @@ export function Titlebar(props: { verticalTabs?: { mount?: HTMLElement } }) {
                                     aria-hidden="true"
                                   />
                                 </Show>
-                                <Show when={homeInSidebarHeader()} fallback={<div class="flex-1" />}>
+                                <Show
+                                  when={homeInSidebarHeader()}
+                                  fallback={
+                                    <div class="flex min-w-0 flex-1 items-center px-1.5" data-tauri-drag-region>
+                                      <Show when={settings.appearance.tabLayout() === "inbox"}>
+                                        <Logo class="h-6 w-auto shrink-0" />
+                                      </Show>
+                                    </div>
+                                  }
+                                >
                                   <div class="min-w-0 flex-1">{homeButton(true)}</div>
                                 </Show>
                                 {/* Optically aligns the toggle's glyph with the selected session's end edge. */}
@@ -882,7 +892,7 @@ export function Titlebar(props: { verticalTabs?: { mount?: HTMLElement } }) {
                                   />
                                 }
                               >
-                                <SidebarInbox />
+                                <BrawlSidebar />{" "}
                               </Show>
                             </div>
                             <Show when={titlebarItems.ids().length > 0}>
