@@ -8,6 +8,7 @@ import { makeLocationNode } from "@opencode/util/effect/app-node"
 import { httpClient } from "@opencode/util/effect/app-node-platform"
 import { Context, Duration, Effect, Layer, Schema } from "effect"
 import { HttpClient, HttpClientRequest, HttpClientResponse } from "effect/http"
+import { BrawlUsage } from "./brawl/usage.js"
 import { ConsoleAccess } from "./console-access.js"
 import type { Credential } from "./credential.js"
 import { Integration } from "./integration.js"
@@ -34,7 +35,10 @@ export const layer = Layer.effect(
 
     const get = Effect.fn("UsageLimits.get")(function* () {
       const connection = yield* integrations.connection.active(Integration.ID.make("opencode"))
-      if (!connection) return undefined
+      if (!connection)
+        return yield* BrawlUsage.get(integrations, http).pipe(
+          Effect.mapError((error) => new UnavailableError({ message: error.message })),
+        )
       const credential = yield* integrations.connection
         .resolve(connection)
         .pipe(Effect.mapError((error) => new UnavailableError({ message: error.message })))

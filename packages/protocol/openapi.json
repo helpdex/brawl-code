@@ -24773,6 +24773,53 @@
         "required": ["_tag", "providerID", "modelID", "capability", "message"],
         "additionalProperties": false
       },
+      "UsageLimits.Brawl": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string"
+          },
+          "plan": {
+            "type": "string"
+          },
+          "concurrent": {
+            "type": "number"
+          },
+          "windows": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/UsageLimits.BrawlWindow"
+            }
+          },
+          "usageURL": {
+            "type": "string"
+          }
+        },
+        "required": ["plan", "windows", "usageURL"],
+        "additionalProperties": false
+      },
+      "UsageLimits.BrawlWindow": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "percent": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 100
+          },
+          "limited": {
+            "type": "boolean"
+          },
+          "resetsAt": {
+            "type": "number",
+            "description": "Milliseconds since the Unix epoch"
+          }
+        },
+        "required": ["id", "percent", "limited", "resetsAt"],
+        "additionalProperties": false
+      },
       "UsageLimits.Budget": {
         "type": "object",
         "properties": {
@@ -24900,6 +24947,9 @@
             "items": {
               "$ref": "#/components/schemas/UsageLimits.Budget"
             }
+          },
+          "brawl": {
+            "$ref": "#/components/schemas/UsageLimits.Brawl"
           }
         },
         "required": ["workspace", "budgets"],

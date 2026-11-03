@@ -364,6 +364,8 @@ export type WebSearchResult = { url: string; title?: string; content?: string; t
 
 export type UsageLimitsMeter = { percent: number; limited: boolean; resetsAt: number }
 
+export type UsageLimitsBrawlWindow = { id: string; percent: number; limited: boolean; resetsAt: number }
+
 export type McpProtocol = "legacy" | "auto" | "2026-07-28"
 
 export type ConfigCompactionPercent = string
@@ -939,6 +941,14 @@ export type VcsInfo = { provider?: string; branch: VcsBranch }
 export type WebSearchProvider = { id: WebSearchID; name: string }
 
 export type UsageLimitsGo = { rolling: UsageLimitsMeter; weekly: UsageLimitsMeter; monthly: UsageLimitsMeter }
+
+export type UsageLimitsBrawl = {
+  email?: string
+  plan: string
+  concurrent?: number
+  windows: Array<UsageLimitsBrawlWindow>
+  usageURL: string
+}
 
 export type ConfigModelCapabilities = {
   tools?: boolean
@@ -2528,6 +2538,7 @@ export type UsageLimitsInfo = {
   workspace: { id: string; name?: string; usageURL: string }
   go?: UsageLimitsGo
   budgets: Array<UsageLimitsBudget>
+  brawl?: UsageLimitsBrawl
 }
 
 export type GenerateImageResponse = { data: GenerateImageResult }

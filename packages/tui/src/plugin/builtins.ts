@@ -13,12 +13,14 @@ import Storybook from "../feature-plugins/system/storybook"
 import Stats from "../feature-plugins/system/stats"
 import Latex from "@opencode/latex/plugin"
 import Merman from "@opencode/merman/plugin"
+import SidebarBrawl from "../brawl/sidebar"
 
 export const builtins = [
   HomeFooter,
   PromptFooter,
   PromptBtw,
   SidebarContext,
+  SidebarBrawl,
   SidebarLimit,
   SidebarMcp,
   SidebarTodo,

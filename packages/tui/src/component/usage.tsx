@@ -24,6 +24,7 @@ import {
   usageLevel,
   type ModelUsage,
 } from "../util/usage-limits"
+import { brawlUsageText, DialogBrawlUsage, useBrawlAlerts } from "../brawl/usage"
 
 /**
  * The OpenCode Console limits on this location's models. Limits load once; `refresh` reloads them, since spend moves
@@ -90,6 +91,7 @@ export function DialogUsage() {
 
   return (
     <Switch>
+      <Match when={limits.info()?.brawl}>{(account) => <DialogBrawlUsage account={account()} />}</Match>
       <Match when={limits.info()}>
         {(info) => (
           <DialogSelect
@@ -122,7 +124,7 @@ export function DialogUsage() {
       <Match when={limits.info() === null}>
         <DialogLayout header={<DialogHeader title="Usage" />}>
           <text fg={theme.text.muted} wrapMode="word">
-            Sign in to OpenCode Console with /connect to see your workspace's usage limits.
+            {brawlUsageText.signIn}
           </text>
         </DialogLayout>
       </Match>
@@ -216,6 +218,7 @@ export function useUsageAlerts(sessionID: () => string) {
   const toast = useToast()
   const keymap = Keymap.use()
   const limits = useUsageLimits()
+  useBrawlAlerts(limits.info)
   onCleanup(
     data.on("session.execution.succeeded", (event) => {
       if (event.data.sessionID === sessionID() && limits.info()) limits.load(true)

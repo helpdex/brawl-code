@@ -62,6 +62,23 @@ export const Budget = Schema.Struct({
   resetsAt: Instant,
 }).annotate({ identifier: "UsageLimits.Budget" })
 
+export interface BrawlWindow extends Schema.Schema.Type<typeof BrawlWindow> {}
+export const BrawlWindow = Schema.Struct({
+  id: Schema.String,
+  percent: Percent,
+  limited: Schema.Boolean,
+  resetsAt: Instant,
+}).annotate({ identifier: "UsageLimits.BrawlWindow" })
+
+export interface Brawl extends Schema.Schema.Type<typeof Brawl> {}
+export const Brawl = Schema.Struct({
+  email: Schema.String.pipe(optional),
+  plan: Schema.String,
+  concurrent: Schema.Finite.pipe(optional),
+  windows: Schema.Array(BrawlWindow),
+  usageURL: Schema.String,
+}).annotate({ identifier: "UsageLimits.Brawl" })
+
 /** The usage limits of the OpenCode Console workspace a location is signed in to. */
 export interface Info extends Schema.Schema.Type<typeof Info> {}
 export const Info = Schema.Struct({
@@ -73,4 +90,5 @@ export const Info = Schema.Struct({
   }),
   go: Go.pipe(optional),
   budgets: Schema.Array(Budget),
+  brawl: Brawl.pipe(optional),
 }).annotate({ identifier: "UsageLimits.Info" })
