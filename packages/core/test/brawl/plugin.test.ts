@@ -171,6 +171,11 @@ describe("BrawlPlugin", () => {
           expect(model?.variants.map((variant) => String(variant.id))).toContain("1M")
           expect(yield* models.get(providerID, Model.ID.make("brawl-code-next"))).toBeDefined()
           expect(yield* models.default()).toMatchObject({ providerID, id: "brawl-code" })
+          expect(model?.headers).toMatchObject({ "X-Brawl-Tools": "visible" })
+          const images = yield* models.available(["image"])
+          expect(images.map((item) => [item.providerID, item.id, item.type, item.name])).toEqual([
+            [providerID, "brawl-image", "image", "Brawl Image"],
+          ])
           expect(requests).toContain("GET /.well-known/opencode")
         }),
       ({ server }) => Effect.promise(() => server.stop(true)),

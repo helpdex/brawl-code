@@ -99,4 +99,13 @@ describe("BrawlPrompt", () => {
       expect(event.system.map((part) => part.text)).toEqual(before)
     }),
   )
+  it.effect("tells Brawl's models when to use Brawl's docs and web search", () =>
+    Effect.sync(() => {
+      const prompt = BrawlPrompt.brawl([...tools, "docs", "websearch"])
+      expect(prompt).toContain("check its current documentation with the docs tool")
+      expect(prompt).toContain("Search the web with websearch")
+      expect(prompt.indexOf("Use the edit tool")).toBeLessThan(prompt.indexOf("docs tool"))
+      expect(BrawlPrompt.brawl(tools)).toBe(SessionSystemPrompt.render(PROMPT, tools))
+    }),
+  )
 })

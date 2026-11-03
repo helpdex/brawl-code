@@ -109,6 +109,7 @@ import { VcsHgPlugin } from "./vcs/hg.js"
 import { ToolInputRepairPlugin } from "./tool-input-repair.js"
 import { OptimizePlugin } from "./optimize.js"
 import { BrawlPrompt } from "../brawl/prompt.js"
+import { BrawlTools } from "../brawl/tools.js"
 import { VcsGitPlugin } from "./vcs/git.js"
 import { VerbosityPlugin } from "./verbosity.js"
 import { WarmingPlugin } from "./warming.js"
@@ -264,6 +265,7 @@ const pre = [
   TodoTool.Plugin,
   WebFetchTool.Plugin,
   WebSearchTool.Plugin,
+  BrawlTools.Plugin,
   WriteTool.Plugin,
   WarmingPlugin.Plugin,
 ] as const satisfies readonly InternalPlugin[]

@@ -241,6 +241,13 @@ function manifest(site: string, api: string, app: App.Info) {
   )
 }
 
+export const visibleTools = { "X-Brawl-Tools": "visible" }
+export const imageModel = {
+  name: "Brawl Image",
+  type: "image",
+  capabilities: { tools: false, input: ["text"], output: ["image"] },
+}
+
 function remote(providers: Readonly<Record<string, Readonly<Record<string, unknown>>>>, api: string) {
   return Schema.decodeUnknownEffect(ConfigIntegration.Remote)({
     providers: Object.fromEntries(
@@ -250,6 +257,12 @@ function remote(providers: Readonly<Record<string, Readonly<Record<string, unkno
           ...provider,
           name: account,
           settings: { ...(isRecord(provider.settings) ? provider.settings : {}), baseURL: api },
+          ...(id === Brawl.id
+            ? {
+                headers: { ...(isRecord(provider.headers) ? provider.headers : {}), ...visibleTools },
+                models: { ...(isRecord(provider.models) ? provider.models : {}), "brawl-image": imageModel },
+              }
+            : {}),
         },
       ]),
     ),
