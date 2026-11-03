@@ -124,7 +124,9 @@ function whatsNew(ctx: SetupContext<typeof definition>) {
       if (commit) draft.commit = commit
     })
 
-  if (!previous || !ctx.stores.releaseNotes.value.enabled) return markSeen()
+  const changelog: boolean = false
+
+  if (!previous || !ctx.stores.releaseNotes.value.enabled || !changelog) return markSeen()
 
   if (ctx.app.channel === "beta") {
     void import("./beta-dialog").then((module) => {

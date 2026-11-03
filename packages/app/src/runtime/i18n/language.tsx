@@ -25,6 +25,7 @@ import {
   type DesktopNativeBundle,
   type DesktopNativeLocale,
 } from "@/runtime/i18n/desktop-native"
+import { brand } from "../../brawl/i18n"
 
 export type Locale = DesktopNativeLocale
 
@@ -96,7 +97,7 @@ const StoredLocaleSchema = Schema.Struct({
 
 const INTL = DESKTOP_NATIVE_LOCALE_TAGS
 
-const base: Dictionary = { ...en, ...dict }
+const base: Dictionary = brand("en", { ...en, ...dict })
 
 const dicts = new Map<Locale, Dictionary>([["en", base]])
 
@@ -177,7 +178,8 @@ function loadDict(locale: Locale) {
   if (locale === "en") return Promise.resolve(base)
   const load = loaders[locale]
 
-  return load().then((next: Dictionary) => {
+  return load().then((loaded: Dictionary) => {
+    const next = brand(locale, loaded)
     dicts.set(locale, next)
 
     return next

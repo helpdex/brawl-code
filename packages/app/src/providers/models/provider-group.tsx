@@ -37,6 +37,9 @@ export function ProviderModelIcon(props: { provider: ModelProvider; class?: stri
       <Match when={props.provider.id === "opencode"}>
         <OpenCodeLogo class={`size-4 ${props.class ?? ""}`} />
       </Match>
+      <Match when={props.provider.id === "brawl"}>
+        <ProviderIcon id="brawl" width={16} height={16} class={props.class} />
+      </Match>
       <Match when={icon()} keyed>
         {(id) => <ProviderIcon id={id} width={16} height={16} class={props.class} />}
       </Match>

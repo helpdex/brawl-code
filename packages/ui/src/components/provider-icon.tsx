@@ -15,12 +15,17 @@ export const ProviderIcon: Component<ProviderIconProps> = (props) => {
     <svg
       data-component="provider-icon"
       {...rest}
+      viewBox={local.id === "brawl" ? "0 0 30 30" : undefined}
       classList={{
         ...local.classList,
         [local.class ?? ""]: !!local.class,
       }}
     >
-      <use href={`${sprite}#${resolved()}`} />
+      {local.id === "brawl" ? (
+        <path d="M12.5 7H17L11.5 23H7ZM19.5 7H24L18.5 23H14Z" fill="currentColor" />
+      ) : (
+        <use href={`${sprite}#${resolved()}`} />
+      )}
     </svg>
   )
 }

@@ -1,4 +1,5 @@
 import { flow, Option, Schema } from "effect"
+import { brand } from "../../brawl/i18n"
 
 export const DESKTOP_NATIVE_LOCALES = [
   "en",
@@ -231,7 +232,7 @@ function locale(value: string) {
 // Bun's ICU currently reports Punjabi's Arabic script as the invalid "Aran" code.
 const normalizeScript = (script?: string) => (script === "Aran" ? "Arab" : script)
 
-export const DESKTOP_NATIVE_ENGLISH = {
+export const DESKTOP_NATIVE_ENGLISH = brand("en", {
   "desktop.microphoneUsage": "OpenCode uses your microphone for voice calls.",
   "desktop.documentsFolderUsage":
     "OpenCode uses files in your Documents folder for projects you open and commands you run there.",
@@ -316,7 +317,7 @@ export const DESKTOP_NATIVE_ENGLISH = {
 
   "desktop.contextMenu.spellcheck": "Spellcheck",
   "desktop.contextMenu.spellcheckLanguages": "Spellcheck Languages",
-} as const
+} as const)
 
 export type DesktopNativeKey = keyof typeof DESKTOP_NATIVE_ENGLISH
 

@@ -2,7 +2,7 @@
 import { $ } from "bun"
 import { exists } from "node:fs/promises"
 import path from "node:path"
-import { copyBuiltCliToResources, downloadCliToResources, getCurrentCli, resolveChannel } from "./utils"
+import { copyBuiltCliToResources, getCurrentCli, resolveChannel } from "./utils"
 import { verifyBundles } from "./verify-bundles"
 
 // Prepares resources/ (icons, metainfo, the bundled CLI) for OPENCODE_CHANNEL and builds the app into out/.
@@ -25,9 +25,9 @@ const built = await exists(path.join(cli, getCurrentCli().package.replace("@open
 if (channel === "prod" && !built)
   throw new Error(`Production desktop builds bundle the CLI from ${cli}; build it first`)
 
-if (built) await copyBuiltCliToResources(cli)
+if (!built) throw new Error(`Brawl Code bundles the CLI from ${cli}; build it first (packages/cli build --single)`)
 
-if (!built) await downloadCliToResources(channel === "beta" ? "beta" : undefined)
+await copyBuiltCliToResources(cli)
 
 await $`bunx electron-vite build`
 

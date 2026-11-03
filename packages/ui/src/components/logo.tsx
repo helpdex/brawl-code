@@ -9,8 +9,11 @@ export const Mark = (props: { class?: string }) => {
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
     >
-      <path data-slot="logo-logo-mark-shadow" d="M12 16H4V8H12V16Z" fill="var(--icon-weak-base)" />
-      <path data-slot="logo-logo-mark-o" d="M12 4H4V16H12V4ZM16 20H0V0H16V20Z" fill="var(--icon-strong-base)" />
+      <path
+        data-slot="logo-logo-mark-o"
+        d="M5.3 2.5H9.5L4.4 17.5H0.2ZM11.8 2.5H16L10.9 17.5H6.7Z"
+        fill="var(--icon-strong-base)"
+      />
     </svg>
   )
 }
@@ -25,8 +28,7 @@ export const Splash = (props: Pick<ComponentProps<"svg">, "ref" | "class">) => {
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
     >
-      <path d="M60 80H20V40H60V80Z" fill="var(--icon-base)" />
-      <path d="M60 20H20V80H60V20ZM80 100H0V0H80V100Z" fill="var(--icon-strong-base)" />
+      <path d="M26.5 12.5H47.5L22 87.5H1ZM59 12.5H80L54.5 87.5H33.5Z" fill="var(--icon-strong-base)" />
     </svg>
   )
 }
@@ -35,27 +37,27 @@ export const Logo = (props: { class?: string }) => {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
-      viewBox="0 0 234 42"
+      viewBox="0 0 246 42"
       fill="none"
       classList={{ [props.class ?? ""]: !!props.class }}
     >
       <g>
-        <path d="M18 30H6V18H18V30Z" fill="var(--icon-weak-base)" />
-        <path d="M18 12H6V30H18V12ZM24 36H0V6H24V36Z" fill="var(--icon-base)" />
-        <path d="M48 30H36V18H48V30Z" fill="var(--icon-weak-base)" />
-        <path d="M36 30H48V12H36V30ZM54 36H36V42H30V6H54V36Z" fill="var(--icon-base)" />
-        <path d="M84 24V30H66V24H84Z" fill="var(--icon-weak-base)" />
-        <path d="M84 24H66V30H84V36H60V6H84V24ZM66 18H78V12H66V18Z" fill="var(--icon-base)" />
-        <path d="M108 36H96V18H108V36Z" fill="var(--icon-weak-base)" />
-        <path d="M108 12H96V36H90V6H108V12ZM114 36H108V12H114V36Z" fill="var(--icon-base)" />
-        <path d="M144 30H126V18H144V30Z" fill="var(--icon-weak-base)" />
-        <path d="M144 12H126V30H144V36H120V6H144V12Z" fill="var(--icon-strong-base)" />
-        <path d="M168 30H156V18H168V30Z" fill="var(--icon-weak-base)" />
-        <path d="M168 12H156V30H168V12ZM174 36H150V6H174V36Z" fill="var(--icon-strong-base)" />
-        <path d="M198 30H186V18H198V30Z" fill="var(--icon-weak-base)" />
-        <path d="M198 12H186V30H198V12ZM204 36H180V6H198V0H204V36Z" fill="var(--icon-strong-base)" />
-        <path d="M234 24V30H216V24H234Z" fill="var(--icon-weak-base)" />
-        <path d="M216 12V18H228V12H216ZM234 24H216V30H234V36H210V6H234V24Z" fill="var(--icon-strong-base)" />
+        <path d="M6 18H18V24H6ZM6 24H18V30H6Z" fill="var(--icon-weak-base)" />
+        <path d="M0 0H6V6H24V36H0ZM6 12V30H18V12Z" fill="var(--icon-base)" />
+        <path d="M30 6H48V12H36V36H30Z" fill="var(--icon-base)" />
+        <path d="M60 24H72V30H60Z" fill="var(--icon-weak-base)" />
+        <path d="M54 6H78V36H54V18H72V12H54ZM60 24V30H72V24Z" fill="var(--icon-base)" />
+        <path d="M90 18H96V24H90ZM102 18H108V24H102ZM90 24H96V30H90ZM102 24H108V30H102Z" fill="var(--icon-weak-base)" />
+        <path d="M84 6H90V30H96V18H102V30H108V6H114V36H84Z" fill="var(--icon-base)" />
+        <path d="M120 0H126V36H120Z" fill="var(--icon-base)" />
+        <path d="M138 18H156V24H138ZM138 24H156V30H138Z" fill="var(--icon-weak-base)" />
+        <path d="M132 6H156V12H138V30H156V36H132Z" fill="var(--icon-strong-base)" />
+        <path d="M168 18H180V24H168ZM168 24H180V30H168Z" fill="var(--icon-weak-base)" />
+        <path d="M162 6H186V36H162ZM168 12V30H180V12Z" fill="var(--icon-strong-base)" />
+        <path d="M198 18H210V24H198ZM198 24H210V30H198Z" fill="var(--icon-weak-base)" />
+        <path d="M192 6H210V0H216V36H192ZM198 12V30H210V12Z" fill="var(--icon-strong-base)" />
+        <path d="M228 24H246V30H228Z" fill="var(--icon-weak-base)" />
+        <path d="M222 6H246V24H228V30H246V36H222ZM228 12V18H240V12Z" fill="var(--icon-strong-base)" />
       </g>
     </svg>
   )

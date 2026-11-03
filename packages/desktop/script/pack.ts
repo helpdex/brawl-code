@@ -36,7 +36,7 @@ if (app) {
   // The installer uses the channel's icons; the rest of the app is already built and signed.
   await $`bun ./script/copy-icons.ts ${resolveChannel()}`
   await $`bunx electron-builder ${flags} --prepackaged ${app}`
-  await cp(`dist/opencode-desktop-win-${cli.cpu}.exe`, path.join(out, `opencode-desktop-win-${cli.cpu}.exe`))
+  await cp(`dist/brawl-code-desktop-win-${cli.cpu}.exe`, path.join(out, `brawl-code-desktop-win-${cli.cpu}.exe`))
 }
 
 if (!app && os === "linux") {
@@ -46,13 +46,13 @@ if (!app && os === "linux") {
 }
 
 if (!app && os === "mac") {
-  await $`bunx electron-builder ${flags} --dir -c.mac.identity=null`
+  await $`bunx electron-builder ${flags} --dir`
   const parent = path.join("dist", cli.cpu === "arm64" ? "mac-arm64" : "mac")
   const bundles = (await readdir(parent)).filter((file) => file.endsWith(".app"))
 
   if (bundles.length !== 1) throw new Error(`Expected one .app bundle in ${parent}, found ${bundles.join(", ")}`)
   await writeUpdateConfig(path.join(parent, bundles[0], "Contents", "Resources"))
-  await $`tar -cf ${path.join(out, `opencode-desktop-mac-${cli.cpu}.app.tar`)} -C ${parent} ${bundles[0]}`
+  await $`tar -cf ${path.join(out, `brawl-code-desktop-mac-${cli.cpu}.app.tar`)} -C ${parent} ${bundles[0]}`
 }
 
 if (!app && os === "win") {
@@ -66,6 +66,8 @@ if (!app && os === "win") {
 // electron-updater reads its feed from that file, so write the one those targets would.
 async function writeUpdateConfig(resources: string) {
   const publish = getConfig().publish
+
+  if (!publish) return
   const name: string = (await Bun.file("package.json").json()).name
   await Bun.write(
     path.join(resources, "app-update.yml"),
