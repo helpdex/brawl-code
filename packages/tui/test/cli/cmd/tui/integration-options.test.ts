@@ -21,10 +21,9 @@ describe("integrationOptions", () => {
         integration({ id: "openai", name: "OpenAI" }),
         integration({ id: "custom-z", name: "Zebra" }),
         integration({ id: "anthropic", name: "Anthropic" }),
-        integration({ id: "opencode", name: "OpenCode Zen" }),
-        integration({ id: "opencode-go", name: "OpenCode Go" }),
+        integration({ id: "brawl", name: "Brawl" }),
       ]).map((item) => item.id),
-    ).toEqual(["opencode", "opencode-go", "openai", "anthropic", "mistral", "custom-z"])
+    ).toEqual(["brawl", "openai", "anthropic", "mistral", "custom-z"])
   })
 })
 

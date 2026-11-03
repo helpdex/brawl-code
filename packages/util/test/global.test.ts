@@ -5,6 +5,7 @@ import path from "path"
 import { pathToFileURL } from "url"
 import { Context, Effect, Layer } from "effect"
 import { Global } from "../src/global.js"
+import { Brawl } from "../src/brawl.js"
 
 describe("global", () => {
   test("importing the module does not create directories", () => {
@@ -27,7 +28,7 @@ describe("global", () => {
     })
 
     expect(result.exitCode, result.stderr.toString()).toBe(0)
-    directories.forEach((directory) => expect(fs.existsSync(path.join(directory, "opencode"))).toBe(false))
+    directories.forEach((directory) => expect(fs.existsSync(path.join(directory, Brawl.app))).toBe(false))
     fs.rmSync(root, { recursive: true, force: true })
   })
 
@@ -83,15 +84,15 @@ describe("global", () => {
     expect(result.exitCode, result.stderr.toString()).toBe(0)
     // The layer canonicalizes through the native realpath, which on Windows also expands 8.3 short
     // names such as RUNNER~1 that the JavaScript realpathSync leaves in place.
-    expect(result.stdout.toString()).toBe(fs.realpathSync.native(path.join(directories[4], "opencode")))
+    expect(result.stdout.toString()).toBe(fs.realpathSync.native(path.join(directories[4], Brawl.app)))
     const created = [
-      path.join(directories[0], "opencode"),
-      path.join(directories[1], "opencode", "bin"),
-      path.join(directories[2], "opencode"),
-      path.join(directories[3], "opencode"),
-      path.join(directories[0], "opencode", "log"),
-      path.join(directories[0], "opencode", "repos"),
-      path.join(directories[4], "opencode"),
+      path.join(directories[0], Brawl.app),
+      path.join(directories[1], Brawl.app, "bin"),
+      path.join(directories[2], Brawl.app),
+      path.join(directories[3], Brawl.app),
+      path.join(directories[0], Brawl.app, "log"),
+      path.join(directories[0], Brawl.app, "repos"),
+      path.join(directories[4], Brawl.app),
     ]
     created.forEach((directory) => expect(fs.statSync(directory).isDirectory()).toBe(true))
     fs.rmSync(root, { recursive: true, force: true })

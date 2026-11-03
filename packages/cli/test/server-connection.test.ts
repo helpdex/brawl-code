@@ -125,28 +125,28 @@ test("global --server and --standalone flags parse in any position for server-co
 
   const url = "http://127.0.0.1:43210"
   const serverCases: ReadonlyArray<readonly [ReadonlyArray<string>, string]> = [
-    [["--server", url, "session", "list"], "opencode session list"],
-    [["session", "--server", url, "list"], "opencode session list"],
-    [["session", "list", "--server", url], "opencode session list"],
-    [["session", "--server", url, "delete", "ses_123"], "opencode session delete"],
-    [["--server", url, "plugin", "list"], "opencode plugin list"],
-    [["plugin", "--server", url, "list"], "opencode plugin list"],
-    [["plugin", "list", "--server", url], "opencode plugin list"],
-    [["plugin", "--server", url, "check"], "opencode plugin check"],
-    [["plugin", "--server", url, "update"], "opencode plugin update"],
-    [["--server", url, "mcp", "list"], "opencode mcp list"],
-    [["mcp", "--server", url, "list"], "opencode mcp list"],
-    [["mcp", "list", "--server", url], "opencode mcp list"],
-    [["mcp", "--server", url, "auth", "linear"], "opencode mcp auth"],
-    [["mcp", "--server", url, "logout", "linear"], "opencode mcp logout"],
-    [["auth", "--server", url, "list"], "opencode auth list"],
-    [["debug", "--server", url, "config"], "opencode debug config"],
-    [["debug", "--server", url, "agents"], "opencode debug agents"],
-    [["debug", "--server", url, "heap-dump"], "opencode debug heap-dump"],
-    [["--server", url, "models"], "opencode models"],
-    [["models", "--server", url], "opencode models"],
-    [["--server", url, "run", "hello"], "opencode run"],
-    [["run", "hello", "--server", url], "opencode run"],
+    [["--server", url, "session", "list"], "brawl-code session list"],
+    [["session", "--server", url, "list"], "brawl-code session list"],
+    [["session", "list", "--server", url], "brawl-code session list"],
+    [["session", "--server", url, "delete", "ses_123"], "brawl-code session delete"],
+    [["--server", url, "plugin", "list"], "brawl-code plugin list"],
+    [["plugin", "--server", url, "list"], "brawl-code plugin list"],
+    [["plugin", "list", "--server", url], "brawl-code plugin list"],
+    [["plugin", "--server", url, "check"], "brawl-code plugin check"],
+    [["plugin", "--server", url, "update"], "brawl-code plugin update"],
+    [["--server", url, "mcp", "list"], "brawl-code mcp list"],
+    [["mcp", "--server", url, "list"], "brawl-code mcp list"],
+    [["mcp", "list", "--server", url], "brawl-code mcp list"],
+    [["mcp", "--server", url, "auth", "linear"], "brawl-code mcp auth"],
+    [["mcp", "--server", url, "logout", "linear"], "brawl-code mcp logout"],
+    [["auth", "--server", url, "list"], "brawl-code auth list"],
+    [["debug", "--server", url, "config"], "brawl-code debug config"],
+    [["debug", "--server", url, "agents"], "brawl-code debug agents"],
+    [["debug", "--server", url, "heap-dump"], "brawl-code debug heap-dump"],
+    [["--server", url, "models"], "brawl-code models"],
+    [["models", "--server", url], "brawl-code models"],
+    [["--server", url, "run", "hello"], "brawl-code run"],
+    [["run", "hello", "--server", url], "brawl-code run"],
   ]
 
   for (const [args, expectedPath] of serverCases) {
@@ -157,7 +157,7 @@ test("global --server and --standalone flags parse in any position for server-co
 
   captured.length = 0
   await runArgs(["session", "--standalone", "list"])
-  expect(captured).toEqual([{ path: "opencode session list", server: undefined, standalone: true }])
+  expect(captured).toEqual([{ path: "brawl-code session list", server: undefined, standalone: true }])
 
   await expect(runArgs(["plugin", "add", "some-plugin", "--server", url])).rejects.toThrow()
   await expect(runArgs(["plugin", "remove", "some-plugin", "--server", url])).rejects.toThrow()
@@ -206,7 +206,7 @@ test("local config commands do not start or require a server", async () => {
         },
       },
     })
-    expect(await Bun.file(path.join(root, "state", "opencode", ServiceConfig.filename())).exists()).toBe(false)
+    expect(await Bun.file(path.join(root, "state", "brawl-code", ServiceConfig.filename())).exists()).toBe(false)
   } finally {
     await fs.rm(root, { recursive: true, force: true })
   }

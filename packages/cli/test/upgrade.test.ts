@@ -58,7 +58,7 @@ describe("upgrade command", () => {
     const result = await cli([], { UPGRADE_TEST_METHOD: "unknown" })
     expect(result.exitCode).toBe(1)
     expect(result.events).toEqual(["method"])
-    expect(result.stdout).toContain("Pass --method")
+    expect(result.stdout).toContain("cannot update itself yet")
   })
 
   test("rejects unsupported methods before attempting an upgrade", async () => {
@@ -113,7 +113,7 @@ async function cli(args: string[], env: Record<string, string> = {}, entry = "fi
       .split("\n")
       .filter((line) => line.startsWith("EVENT "))
       .map((line) => JSON.parse(line.slice(6)))
-    expect(await Bun.file(path.join(root, "state", "opencode", "service-local.json")).exists()).toBe(false)
+    expect(await Bun.file(path.join(root, "state", "brawl-code", "service-local.json")).exists()).toBe(false)
     return { stdout, stderr, exitCode, events }
   } finally {
     await rm(root, { recursive: true, force: true })

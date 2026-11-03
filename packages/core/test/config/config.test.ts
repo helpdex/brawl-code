@@ -352,21 +352,21 @@ describe("Config", () => {
 
   test("resolves the system configuration directory per platform", () => {
     expect(ConfigDiscovery.systemDirectory("darwin", {})).toBe(
-      AbsolutePath.make("/Library/Application Support/opencode"),
+      AbsolutePath.make("/Library/Application Support/brawl-code"),
     )
-    expect(ConfigDiscovery.systemDirectory("linux", {})).toBe(AbsolutePath.make("/etc/opencode"))
+    expect(ConfigDiscovery.systemDirectory("linux", {})).toBe(AbsolutePath.make("/etc/brawl-code"))
     expect(ConfigDiscovery.systemDirectory("win32", { ProgramData: "D:\\ProgramData" })).toBe(
-      AbsolutePath.make(path.join("D:\\ProgramData", "opencode")),
+      AbsolutePath.make(path.join("D:\\ProgramData", "brawl-code")),
     )
     expect(ConfigDiscovery.systemDirectory("win32", {})).toBe(
-      AbsolutePath.make(path.join("C:\\ProgramData", "opencode")),
+      AbsolutePath.make(path.join("C:\\ProgramData", "brawl-code")),
     )
   })
 
   test("resolves macOS managed preferences with user-specific profiles first", () => {
     expect(ConfigDiscovery.preferencePaths("alice")).toEqual([
-      AbsolutePath.make(path.join("/Library/Managed Preferences", "alice", "ai.opencode.managed.plist")),
-      AbsolutePath.make("/Library/Managed Preferences/ai.opencode.managed.plist"),
+      AbsolutePath.make(path.join("/Library/Managed Preferences", "alice", "io.brawl.code.managed.plist")),
+      AbsolutePath.make("/Library/Managed Preferences/io.brawl.code.managed.plist"),
     ])
   })
 
