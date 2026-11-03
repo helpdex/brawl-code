@@ -173,8 +173,8 @@ describe("BrawlPlugin", () => {
           expect(yield* models.default()).toMatchObject({ providerID, id: "brawl-code" })
           expect(model?.headers).toMatchObject({ "X-Brawl-Tools": "visible" })
           const images = yield* models.available(["image"])
-          expect(images.map((item) => [item.providerID, item.id, item.type, item.name])).toEqual([
-            [providerID, "brawl-image", "image", "Brawl Image"],
+          expect(images.map((item) => [item.providerID, item.id, item.type, item.name, item.package])).toEqual([
+            [providerID, "brawl-image", "image", "Brawl Image", "@opencode/ai/providers/openai-compatible/images"],
           ])
           expect(requests).toContain("GET /.well-known/opencode")
         }),

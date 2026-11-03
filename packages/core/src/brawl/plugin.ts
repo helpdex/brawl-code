@@ -245,6 +245,7 @@ export const visibleTools = { "X-Brawl-Tools": "visible" }
 export const imageModel = {
   name: "Brawl Image",
   type: "image",
+  package: "@opencode/ai/providers/openai-compatible/images",
   capabilities: { tools: false, input: ["text"], output: ["image"] },
 }
 
