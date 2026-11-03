@@ -7,6 +7,7 @@ import path from "path"
 import { Script } from "@opencode/script"
 import { embed } from "@opencode/script/highlights"
 import { createSolidTransformPlugin } from "@opentui/solid/bun-plugin"
+import { localizePlugin } from "./brawl/localize-plugin"
 import type { BunPlugin } from "bun"
 import pkg from "../package.json"
 import { discoverPluginRuntimeSpecifiers, pluginRuntimeLoaderCode } from "@opencode/plugin/runtime-modules"
@@ -162,6 +163,7 @@ export default { path: file, version: ${JSON.stringify(opencodePty.version)}, sh
     tsconfig: "./tsconfig.json",
     plugins: [
       appAssetsPlugin,
+      localizePlugin,
       solidPlugin,
       parcelWatcherPlugin,
       opencodePtyPlugin,
