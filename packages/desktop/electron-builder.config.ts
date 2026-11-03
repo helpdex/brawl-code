@@ -224,7 +224,7 @@ export function getConfig() {
         appId,
         productName: "Brawl Code Dev",
         publish: null,
-        deb: { fpm: [...previewCompressionFpm("deb"), metainfoFpm(appId)] },
+        deb: { packageName: "brawl-code-dev", fpm: [...previewCompressionFpm("deb"), metainfoFpm(appId)] },
         rpm: {
           packageName: "brawl-code-dev",
           fpm: [rpmNoBuildIdLinksFpm, ...previewCompressionFpm("rpm"), metainfoFpm(appId)],
@@ -239,7 +239,7 @@ export function getConfig() {
         productName: "Brawl Code Beta",
         protocols: { name: "Brawl Code Beta", schemes: ["brawl-code"] },
         publish: null,
-        deb: { fpm: [...previewCompressionFpm("deb"), metainfoFpm(appId)] },
+        deb: { packageName: "brawl-code-beta", fpm: [...previewCompressionFpm("deb"), metainfoFpm(appId)] },
         rpm: {
           packageName: "brawl-code-beta",
           fpm: [rpmNoBuildIdLinksFpm, ...previewCompressionFpm("rpm"), metainfoFpm(appId)],
@@ -259,7 +259,7 @@ export function getConfig() {
         // The DMG volume icon would otherwise use the same actool-generated ICNS.
         dmg: { icon: "resources/icons/icon.icns" },
         publish: null,
-        deb: { fpm: [metainfoFpm(appId)] },
+        deb: { packageName: "brawl-code", fpm: [metainfoFpm(appId)] },
         rpm: { packageName: "brawl-code", fpm: [rpmNoBuildIdLinksFpm, metainfoFpm(appId)] },
       }
     }
