@@ -8,6 +8,7 @@ import { sessionTabTitle } from "@/shell/titlebar/tab-title"
 import { createSessionInbox, type InboxEntry, type InboxStatus } from "@/shell/titlebar/inbox-model"
 import { workingSince } from "@/shell/titlebar/inbox-working"
 import { sidebarText } from "./sidebar-text"
+import { BrawlSidebarAccount } from "./sidebar-account"
 
 const SHOWN = 5
 
@@ -134,6 +135,7 @@ export function BrawlSidebar() {
           )}
         </For>
       </div>
+      <BrawlSidebarAccount entries={groups().flatMap((group) => group.entries)} text={text()} />
     </div>
   )
 }

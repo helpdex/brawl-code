@@ -318,6 +318,14 @@ import type {
   ConfigShellsOutput,
   ExperimentalConfigUpdateInput,
   ExperimentalConfigUpdateOutput,
+  BrawlGitCommitInput,
+  BrawlGitCommitOutput,
+  BrawlGitMessageInput,
+  BrawlGitMessageOutput,
+  BrawlGitDiscardInput,
+  BrawlGitDiscardOutput,
+  BrawlSessionDiscardInput,
+  BrawlSessionDiscardOutput,
 } from "./types.js"
 import { ClientError } from "./client-error.js"
 
@@ -2666,6 +2674,64 @@ export function make(options: ClientOptions) {
           },
           requestOptions,
         ),
+    },
+    brawl: {
+      git: {
+        commit: (input: BrawlGitCommitInput, requestOptions?: RequestOptions) =>
+          request<BrawlGitCommitOutput>(
+            {
+              method: "POST",
+              path: `/api/brawl/git/commit`,
+              query: { location: input["location"] },
+              body: { message: input["message"], push: input["push"] },
+              successStatus: 200,
+              declaredStatuses: [400, 401, 404, 503],
+              empty: false,
+            },
+            requestOptions,
+          ),
+        message: (input?: BrawlGitMessageInput, requestOptions?: RequestOptions) =>
+          request<BrawlGitMessageOutput>(
+            {
+              method: "POST",
+              path: `/api/brawl/git/message`,
+              query: { location: input?.["location"] },
+              body: { model: input?.["model"], sessionID: input?.["sessionID"] },
+              successStatus: 200,
+              declaredStatuses: [400, 401, 404, 503],
+              empty: false,
+            },
+            requestOptions,
+          ),
+        discard: (input: BrawlGitDiscardInput, requestOptions?: RequestOptions) =>
+          request<BrawlGitDiscardOutput>(
+            {
+              method: "POST",
+              path: `/api/brawl/git/discard`,
+              query: { location: input["location"] },
+              body: { files: input["files"] },
+              successStatus: 200,
+              declaredStatuses: [400, 401, 404, 503],
+              empty: false,
+            },
+            requestOptions,
+          ),
+      },
+      session: {
+        discard: (input: BrawlSessionDiscardInput, requestOptions?: RequestOptions) =>
+          request<BrawlSessionDiscardOutput>(
+            {
+              method: "POST",
+              path: `/api/brawl/session/${encodeURIComponent(input.sessionID)}/discard`,
+              query: { location: input["location"] },
+              body: { files: input["files"] },
+              successStatus: 200,
+              declaredStatuses: [400, 401, 404, 503],
+              empty: false,
+            },
+            requestOptions,
+          ),
+      },
     },
   }
   return {

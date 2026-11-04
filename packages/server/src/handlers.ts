@@ -32,6 +32,7 @@ import { VcsHandler } from "./handlers/vcs"
 import { EventFeed } from "./event-feed"
 import { MigrationHandler } from "./handlers/migration"
 import { ConfigHandler } from "./handlers/config"
+import { BrawlHandler } from "./handlers/brawl"
 
 export const handlers = Layer.mergeAll(
   ServerHandler,
@@ -66,4 +67,5 @@ export const handlers = Layer.mergeAll(
   WorktreeHandler,
   VcsHandler,
   ConfigHandler,
+  BrawlHandler,
 )

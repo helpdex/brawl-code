@@ -1,4 +1,5 @@
 import { Database } from "@opencode/core/database/database"
+import { AppProcess } from "@opencode/util/process"
 import { V1Migration } from "@opencode/core/database/v1-migration"
 import { App } from "@opencode/core/app"
 import { LayerNode } from "@opencode/util/effect/layer-node"
@@ -83,6 +84,7 @@ const applicationServiceNodes = [
   Schedule.node,
   Workspace.node,
   FileWatch.node,
+  AppProcess.node,
 ] as const
 const applicationServices = LayerNode.group(applicationServiceNodes)
 

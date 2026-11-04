@@ -1,0 +1,148 @@
+[data-component="brawl-review-actions"] {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+  border-top: 1px solid var(--v2-border-border-muted);
+  background-color: var(--v2-background-bg-base);
+
+  .brawl-review-commit {
+    margin-left: auto;
+  }
+}
+
+.brawl-review-commit,
+.brawl-commit-split > button {
+  background-image: none;
+  background-color: var(--v2-background-bg-accent);
+  color: #0b0b0d;
+
+  &:hover:not(:disabled) {
+    background-image: none;
+    background-color: var(--v2-icon-icon-accent-hover);
+  }
+}
+
+.brawl-commit-split {
+  display: inline-flex;
+
+  > button:first-child {
+    border-start-end-radius: 0;
+    border-end-end-radius: 0;
+  }
+
+  > button + button {
+    padding-inline: 6px;
+    border-start-start-radius: 0;
+    border-end-start-radius: 0;
+    border-left: 1px solid rgb(0 0 0 / 0.25);
+  }
+}
+
+.brawl-review-dialog {
+  width: min(480px, calc(100vw - 32px));
+
+  [data-slot="dialog-body"] {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding-inline: 16px;
+  }
+
+  [data-slot="dialog-footer"] {
+    align-items: center;
+  }
+
+  [data-component="textarea-v2"] {
+    width: 100%;
+  }
+}
+
+[data-slot="brawl-review-files"] {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid var(--v2-border-border-muted);
+  background-color: var(--v2-background-bg-layer-01);
+  font-family: var(--font-family-mono);
+  font-size: 12px;
+}
+
+[data-slot="brawl-review-file"] {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+[data-slot="brawl-review-path"] {
+  flex: 1 1 0;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--v2-text-text-base);
+}
+
+[data-slot="brawl-review-more"],
+[data-slot="brawl-commit-note"],
+[data-slot="brawl-commit-hint"] {
+  color: var(--v2-text-text-faint);
+  font-size: 12px;
+}
+
+[data-slot="brawl-review-add"] {
+  color: var(--text-diff-add-base);
+  font-family: var(--font-family-mono);
+}
+
+[data-slot="brawl-review-del"],
+[data-slot="brawl-review-removed"] {
+  color: var(--text-diff-delete-base);
+  font-family: var(--font-family-mono);
+}
+
+[data-slot="brawl-review-error"] {
+  color: var(--v2-state-fg-danger);
+  font-size: 12.5px;
+  white-space: pre-wrap;
+}
+
+[data-slot="brawl-commit-meta"] {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+}
+
+[data-slot="brawl-commit-branch"] {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  height: 22px;
+  padding-inline: 7px;
+  border-radius: 6px;
+  border: 1px solid var(--v2-border-border-muted);
+  font-family: var(--font-family-mono);
+  color: var(--v2-text-text-muted);
+}
+
+[data-slot="brawl-commit-note"] {
+  margin-right: auto;
+}
+
+.brawl-commit-menu [role="menuitem"] {
+  height: auto;
+  min-height: 28px;
+  padding-block: 6px;
+}
+
+[data-slot="brawl-commit-item"] {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}

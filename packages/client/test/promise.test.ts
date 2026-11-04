@@ -33,6 +33,7 @@ test("exposes every standard HTTP API group", () => {
     "debug",
     "websearch",
     "config",
+    "brawl",
     "generate",
     "voice",
     "migration",

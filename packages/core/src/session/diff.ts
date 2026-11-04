@@ -47,6 +47,26 @@ export const turn = Effect.fn("SessionDiff.turn")(function* (
     readonly context?: number
   },
 ) {
+  const found = yield* range(db, input)
+  if (!found) return []
+  const { from, final, recorded, location } = found
+  return yield* Effect.gen(function* () {
+    const snapshot = yield* Snapshot.Service
+    const running = input.active && final.completed === null
+    const to = running ? ((yield* snapshot.capture()) ?? recorded) : recorded
+    if (!to) return []
+    return yield* snapshot.diff({
+      from: Snapshot.ID.make(from),
+      to: Snapshot.ID.make(to),
+      context: input.context ?? PATCH_CONTEXT_LINES,
+    })
+  }).pipe(Effect.provide(locations.get(location)))
+})
+
+export const range = Effect.fn("SessionDiff.range")(function* (
+  db: Database.Interface["db"],
+  input: { readonly session: SessionSchema.Info; readonly from?: SessionMessage.ID; readonly to?: SessionMessage.ID },
+) {
   const sessionID = input.session.id
   // Selecting only seq lets the (session_id, type, seq) index answer these without reading message rows,
   // which can be megabytes each. Matching the requested IDs here with OR would scan the whole Session.
@@ -85,7 +105,7 @@ export const turn = Effect.fn("SessionDiff.turn")(function* (
         .limit(1)
         .get()
         .pipe(Effect.orDie)
-  if (!anchor) return []
+  if (!anchor) return undefined
   const last = input.to ? yield* resolve("to", input.to) : anchor
   if (last.seq < anchor.seq)
     return yield* new TurnRangeError({ sessionID, field: "to", message: `Message ${last.id} precedes ${anchor.id}` })
@@ -117,7 +137,7 @@ export const turn = Effect.fn("SessionDiff.turn")(function* (
   const first = steps[0]
   const final = steps[steps.length - 1]
   const from = steps.find((step) => step.start)?.start
-  if (!first || !final || !from) return []
+  if (!first || !final || !from) return undefined
   const switches = yield* db
     .select({
       seq: SessionMessageTable.seq,
@@ -135,15 +155,5 @@ export const turn = Effect.fn("SessionDiff.turn")(function* (
   const after = switches.find((row) => row.seq > first.seq)?.previous
   const location = before ? decodeLocation(before) : after ? decodeLocation(after) : input.session.location
   const recorded = steps.findLast((step) => step.end)?.end
-  return yield* Effect.gen(function* () {
-    const snapshot = yield* Snapshot.Service
-    const running = input.active && final.completed === null
-    const to = running ? ((yield* snapshot.capture()) ?? recorded) : recorded
-    if (!to) return []
-    return yield* snapshot.diff({
-      from: Snapshot.ID.make(from),
-      to: Snapshot.ID.make(to),
-      context: input.context ?? PATCH_CONTEXT_LINES,
-    })
-  }).pipe(Effect.provide(locations.get(location)))
+  return { from, final, recorded, location }
 })

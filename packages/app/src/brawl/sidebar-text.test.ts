@@ -28,4 +28,13 @@ describe("sidebarText", () => {
     expect(text.working(text.duration(4 * 60 + 5))).toBe("работает · 4 мин")
     expect(sidebarText("de").working(sidebarText("de").duration(2 * 3600))).toBe("working · 2 h")
   })
+
+  test("the account footer names the plan and the generations against the limit", () => {
+    expect(sidebarText("ru").plan("beta")).toBe("Бета · бесплатно")
+    expect(sidebarText("ru").streams(1, 1)).toBe("1 из 1 потока")
+    expect(sidebarText("ru").streams(0, 3)).toBe("0 из 3 потоков")
+    expect(sidebarText("en").plan("beta")).toBe("Beta · free")
+    expect(sidebarText("en").streams(1, 2)).toBe("1 of 2 streams")
+    expect(sidebarText("en").plan("pro")).toBe("Pro")
+  })
 })

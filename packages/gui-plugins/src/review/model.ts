@@ -700,6 +700,10 @@ export function createReviewModel(input: {
         draft.mode = value
       }),
     setScroll,
+    reload: () => {
+      refresh()
+      void queryClient.invalidateQueries({ queryKey: turnKey() })
+    },
   }
 }
 

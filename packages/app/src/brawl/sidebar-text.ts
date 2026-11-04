@@ -9,6 +9,10 @@ export type SidebarText = {
   working: (duration: string) => string
   duration: (seconds: number) => string
   age: (now: number, at: number) => string
+  plan: (plan: string) => string
+  streams: (used: number, limit: number) => string
+  window: (id: string, percent: number) => string
+  usage: string
 }
 
 const ruPlural = (count: number, one: string, few: string, many: string) => {
@@ -70,6 +74,10 @@ const russian: SidebarText = {
 
     return new Date(at).toLocaleDateString("ru", { day: "numeric", month: "long" })
   },
+  plan: (plan) => (plan === "beta" ? "Бета · бесплатно" : plan.charAt(0).toUpperCase() + plan.slice(1)),
+  streams: (used, limit) => `${used} из ${limit} ${ruPlural(limit, "потока", "потоков", "потоков")}`,
+  window: (id, percent) => `${id} · ${percent}%`,
+  usage: "Использование на brawl.io",
 }
 
 const english: SidebarText = {
@@ -106,6 +114,10 @@ const english: SidebarText = {
 
     return new Date(at).toLocaleDateString("en", { day: "numeric", month: "long" })
   },
+  plan: (plan) => (plan === "beta" ? "Beta · free" : plan.charAt(0).toUpperCase() + plan.slice(1)),
+  streams: (used, limit) => `${used} of ${limit} ${limit === 1 ? "stream" : "streams"}`,
+  window: (id, percent) => `${id} · ${percent}%`,
+  usage: "Usage on brawl.io",
 }
 
 export const sidebarText = (locale: string): SidebarText => (locale === "ru" ? russian : english)

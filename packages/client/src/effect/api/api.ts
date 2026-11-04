@@ -2782,6 +2782,69 @@ export interface ExperimentalConfigApi<E = never> {
   readonly update: ExperimentalConfigUpdateOperation<E>
 }
 
+export type BrawlGitCommitInput = {
+  readonly location?: { readonly directory?: string | undefined } | undefined
+  readonly message: string
+  readonly push: boolean
+}
+export type BrawlGitCommitOutput = {
+  readonly location: Location.PublicRef
+  readonly data: {
+    readonly hash: string
+    readonly branch?: string | undefined
+    readonly pushed: boolean
+    readonly pushError?: string | undefined
+  }
+}
+export type BrawlGitCommitOperation<E = never> = (input: BrawlGitCommitInput) => Effect.Effect<BrawlGitCommitOutput, E>
+
+export type BrawlGitMessageInput = {
+  readonly location?: { readonly directory?: string | undefined } | undefined
+  readonly model?: Model.Ref | undefined
+  readonly sessionID?: Session.ID | undefined
+}
+export type BrawlGitMessageOutput = {
+  readonly location: Location.PublicRef
+  readonly data: { readonly message: string }
+}
+export type BrawlGitMessageOperation<E = never> = (
+  input?: BrawlGitMessageInput,
+) => Effect.Effect<BrawlGitMessageOutput, E>
+
+export type BrawlGitDiscardInput = {
+  readonly location?: { readonly directory?: string | undefined } | undefined
+  readonly files: ReadonlyArray<string>
+}
+export type BrawlGitDiscardOutput = {
+  readonly location: Location.PublicRef
+  readonly data: { readonly files: ReadonlyArray<string> }
+}
+export type BrawlGitDiscardOperation<E = never> = (
+  input: BrawlGitDiscardInput,
+) => Effect.Effect<BrawlGitDiscardOutput, E>
+
+export type BrawlSessionDiscardInput = {
+  readonly sessionID: Session.ID
+  readonly location?: { readonly directory?: string | undefined } | undefined
+  readonly files: ReadonlyArray<string>
+}
+export type BrawlSessionDiscardOutput = {
+  readonly location: Location.PublicRef
+  readonly data: { readonly files: ReadonlyArray<string> }
+}
+export type BrawlSessionDiscardOperation<E = never> = (
+  input: BrawlSessionDiscardInput,
+) => Effect.Effect<BrawlSessionDiscardOutput, E>
+
+export interface BrawlApi<E = never> {
+  readonly git: {
+    readonly commit: BrawlGitCommitOperation<E>
+    readonly message: BrawlGitMessageOperation<E>
+    readonly discard: BrawlGitDiscardOperation<E>
+  }
+  readonly session: { readonly discard: BrawlSessionDiscardOperation<E> }
+}
+
 /** @deprecated Use `ExperimentalSessionStatsInput`. Removed in the next minor. */
 export type SessionStatsInput = ExperimentalSessionStatsInput
 
@@ -3052,6 +3115,7 @@ export interface AppApi<E = never> {
   readonly debug: DebugApi<E>
   readonly websearch: WebsearchApi<E>
   readonly config: ConfigApi<E>
+  readonly brawl: BrawlApi<E>
 
   /** @deprecated Use `client.experimental.generate`. Removed in the next minor. */
   readonly generate: {

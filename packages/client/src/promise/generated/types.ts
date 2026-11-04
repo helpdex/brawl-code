@@ -378,6 +378,8 @@ export type ConfigModelReasoning =
 
 export type ConfigShellOption = { path: string; name: string; acceptable: boolean }
 
+export type BrawlCommit = { hash: string; branch?: string; pushed: boolean; pushError?: string }
+
 export type LocationPublicRef = { directory: AbsolutePath }
 
 export type FileSystemWrite = { path: AbsolutePath }
@@ -4806,6 +4808,37 @@ export type ConfigShellsOutput = Array<ConfigShellOption>
 export type ExperimentalConfigUpdateInput = { readonly shell: string | null }
 
 export type ExperimentalConfigUpdateOutput = void
+
+export type BrawlGitCommitInput = {
+  readonly location?: { readonly directory?: string | undefined } | undefined
+  readonly message: string
+  readonly push: boolean
+}
+
+export type BrawlGitCommitOutput = { location: LocationPublicRef; data: BrawlCommit }
+
+export type BrawlGitMessageInput = {
+  readonly location?: { readonly directory?: string | undefined } | undefined
+  readonly model?: { readonly id: string; readonly providerID: string; readonly variant?: string } | null | undefined
+  readonly sessionID?: string | null | undefined
+}
+
+export type BrawlGitMessageOutput = { location: LocationPublicRef; data: { message: string } }
+
+export type BrawlGitDiscardInput = {
+  readonly location?: { readonly directory?: string | undefined } | undefined
+  readonly files: ReadonlyArray<string>
+}
+
+export type BrawlGitDiscardOutput = { location: LocationPublicRef; data: { files: Array<string> } }
+
+export type BrawlSessionDiscardInput = {
+  readonly sessionID: string
+  readonly location?: { readonly directory?: string | undefined } | undefined
+  readonly files: ReadonlyArray<string>
+}
+
+export type BrawlSessionDiscardOutput = { location: LocationPublicRef; data: { files: Array<string> } }
 
 /** @deprecated Use `ExperimentalSessionStatsInput`. Removed in the next minor. */
 export type SessionStatsInput = ExperimentalSessionStatsInput

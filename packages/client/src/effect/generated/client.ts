@@ -316,6 +316,14 @@ import type {
   ConfigShellsOutput,
   ExperimentalConfigUpdateInput,
   ExperimentalConfigUpdateOutput,
+  BrawlGitCommitInput,
+  BrawlGitCommitOutput,
+  BrawlGitMessageInput,
+  BrawlGitMessageOutput,
+  BrawlGitDiscardInput,
+  BrawlGitDiscardOutput,
+  BrawlSessionDiscardInput,
+  BrawlSessionDiscardOutput,
 } from "../api/api.js"
 import { ClientError } from "./client-error.js"
 
@@ -1943,6 +1951,47 @@ const adaptGroupExperimentalConfig = (raw: RawClient["server.config"]) => ({
   update: EndpointExperimentalConfigUpdate(raw),
 })
 
+const EndpointBrawlGitCommit = (raw: RawClient["server.brawl"]) => (input: BrawlGitCommitInput) =>
+  preserveEffect<BrawlGitCommitOutput>()(
+    raw["brawl.git.commit"]({
+      query: { location: input["location"] },
+      payload: { message: input["message"], push: input["push"] },
+    }).pipe(Effect.mapError(mapClientError)),
+  )
+
+const EndpointBrawlGitMessage = (raw: RawClient["server.brawl"]) => (input?: BrawlGitMessageInput) =>
+  preserveEffect<BrawlGitMessageOutput>()(
+    raw["brawl.git.message"]({
+      query: { location: input?.["location"] },
+      payload: { model: input?.["model"], sessionID: input?.["sessionID"] },
+    }).pipe(Effect.mapError(mapClientError)),
+  )
+
+const EndpointBrawlGitDiscard = (raw: RawClient["server.brawl"]) => (input: BrawlGitDiscardInput) =>
+  preserveEffect<BrawlGitDiscardOutput>()(
+    raw["brawl.git.discard"]({ query: { location: input["location"] }, payload: { files: input["files"] } }).pipe(
+      Effect.mapError(mapClientError),
+    ),
+  )
+
+const EndpointBrawlSessionDiscard = (raw: RawClient["server.brawl"]) => (input: BrawlSessionDiscardInput) =>
+  preserveEffect<BrawlSessionDiscardOutput>()(
+    raw["brawl.session.discard"]({
+      params: { sessionID: input["sessionID"] },
+      query: { location: input["location"] },
+      payload: { files: input["files"] },
+    }).pipe(Effect.mapError(mapClientError)),
+  )
+
+const adaptGroupBrawl = (raw: RawClient["server.brawl"]) => ({
+  git: {
+    commit: EndpointBrawlGitCommit(raw),
+    message: EndpointBrawlGitMessage(raw),
+    discard: EndpointBrawlGitDiscard(raw),
+  },
+  session: { discard: EndpointBrawlSessionDiscard(raw) },
+})
+
 const adaptClient = (raw: RawClient) => {
   const client = {
     server: adaptGroupServer(raw["server.server"]),
@@ -1984,6 +2033,7 @@ const adaptClient = (raw: RawClient) => {
     debug: adaptGroupDebug(raw["server.debug"]),
     websearch: adaptGroupWebsearch(raw["server.websearch"]),
     config: adaptGroupConfig(raw["server.config"]),
+    brawl: adaptGroupBrawl(raw["server.brawl"]),
   }
   return {
     ...client,

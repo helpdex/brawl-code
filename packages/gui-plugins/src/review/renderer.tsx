@@ -19,6 +19,7 @@ import {
   LinkHandler,
   MenuItem,
   SettingsPage,
+  Style,
   usePanel,
   type SessionScreen,
   type SessionRef,
@@ -30,12 +31,14 @@ import { BuiltinPanel, onIdle, type BuiltinPanelTab } from "@opencode/plugin/gui
 import { Changes, type ChangeKind } from "@opencode/plugin/gui/review"
 import type Review from "./index"
 import { createReviewModel, type Demand, type ReviewModel } from "./model"
+import brawlStyles from "./brawl-actions.css?inline"
 
 const TAB = "changes"
 
 const KEY = `review:${TAB}`
 
 const setup: Plugin.Setup<typeof Review> = (ctx) => {
+  ctx.add(Style, brawlStyles)
   const owner = getOwner()
   const sessions = ctx.sessions
   const layout = ctx.layout
@@ -136,7 +139,7 @@ const setup: Plugin.Setup<typeof Review> = (ctx) => {
     dom: { tab: "session-side-panel-review-tab", panel: "session-side-panel-review-tabpanel" },
   }
 
-  const ReviewPanel = lazy(() => import("./panel"))
+  const ReviewPanel = lazy(() => import("./brawl-panel"))
   const MobileReview = lazy(() => import("./mobile"))
 
   onCleanup(onIdle(() => void (layout.narrow() ? MobileReview : ReviewPanel).preload()))
