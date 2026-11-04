@@ -1,0 +1,163 @@
+[data-slot="brawl-plan-count"] {
+  font-family: var(--v2-font-family-code);
+  font-size: 12px;
+  color: var(--v2-text-text-faint);
+}
+
+[aria-selected="true"] [data-slot="brawl-plan-count"] {
+  color: var(--v2-text-text-muted);
+}
+
+[data-component="brawl-plan"] {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+  background-color: var(--v2-background-bg-base);
+}
+
+[data-slot="brawl-plan-header"] {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 16px 18px 12px;
+}
+
+[data-slot="brawl-plan-title"] {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--v2-text-text-base);
+}
+
+[data-slot="brawl-plan-progress"] {
+  font-family: var(--v2-font-family-code);
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--v2-text-text-muted);
+}
+
+[data-slot="brawl-plan-meter"] {
+  height: 4px;
+  border-radius: 999px;
+  overflow: hidden;
+  background-color: var(--v2-background-bg-layer-02);
+
+  i {
+    display: block;
+    height: 100%;
+    border-radius: 999px;
+    background-color: var(--v2-background-bg-accent);
+    transition: width 200ms ease-out;
+  }
+}
+
+[data-slot="brawl-plan-items"] {
+  flex: 1 1 0;
+  min-height: 0;
+  overflow-y: auto;
+  margin: 0;
+  padding: 2px 8px 8px;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+[data-slot="brawl-plan-item"] {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 9px 10px;
+  border-radius: 8px;
+  font-size: 13.5px;
+  line-height: 19px;
+  color: var(--v2-text-text-muted);
+
+  &[data-status="completed"] {
+    color: var(--v2-text-text-faint);
+  }
+
+  &[data-status="cancelled"] {
+    color: var(--v2-text-text-faint);
+    text-decoration: line-through;
+  }
+
+  &[data-current] {
+    color: var(--v2-text-text-base);
+    font-weight: 500;
+    background-color: var(--v2-background-bg-layer-01);
+    box-shadow: inset 0 0 0 1px var(--v2-border-border-muted);
+  }
+}
+
+[data-slot="brawl-plan-text"] {
+  flex: 1 1 0;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+[data-slot="brawl-plan-mark"] {
+  position: relative;
+  flex: none;
+  width: 16px;
+  height: 16px;
+  margin-top: 1.5px;
+  border-radius: 999px;
+  border: 1.5px solid var(--v2-border-border-strong);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  [data-status="completed"] > & {
+    border: none;
+    color: var(--v2-state-fg-success);
+    background-color: color-mix(in srgb, var(--v2-state-fg-success) 14%, transparent);
+
+    [data-component="icon"],
+    svg {
+      width: 12px;
+      height: 12px;
+    }
+  }
+
+  [data-status="cancelled"] > &::after {
+    content: "";
+    width: 6px;
+    height: 1.5px;
+    border-radius: 1px;
+    background-color: var(--v2-text-text-faint);
+  }
+
+  [data-current] > & {
+    border-color: var(--v2-icon-icon-accent);
+
+    &::after {
+      content: "";
+      width: 6px;
+      height: 6px;
+      border-radius: 999px;
+      background-color: var(--v2-icon-icon-accent);
+    }
+  }
+}
+
+[data-slot="brawl-plan-now"] {
+  flex: none;
+  font-family: var(--v2-font-family-code);
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--v2-text-text-accent);
+}
+
+[data-slot="brawl-plan-note"] {
+  flex: none;
+  margin: 0;
+  padding: 14px 18px 16px;
+  border-top: 1px solid var(--v2-border-border-muted);
+  font-size: 12px;
+  line-height: 17px;
+  color: var(--v2-text-text-faint);
+}

@@ -11,6 +11,8 @@ import file from "./file"
 import fileRenderer from "./file/renderer"
 import review from "./review"
 import reviewRenderer from "./review/renderer"
+import brawlPlan from "./brawl-plan"
+import brawlPlanRenderer from "./brawl-plan/renderer"
 import details from "./details"
 import detailsRenderer from "./details/renderer"
 import browser from "./browser"
@@ -43,6 +45,7 @@ export const builtins = compose({
   terminal: { ...terminal, windowEntry: eager(terminalRenderer) },
   file: { ...file, windowEntry: eager(fileRenderer) },
   review: { ...review, windowEntry: eager(reviewRenderer) },
+  "brawl-plan": { ...brawlPlan, windowEntry: eager(brawlPlanRenderer) },
   details: { ...details, windowEntry: eager(detailsRenderer) },
   browser: { ...browser, windowEntry: eager(browserRenderer) },
   pairing: { ...pairing, windowEntry: eager(pairingRenderer) },

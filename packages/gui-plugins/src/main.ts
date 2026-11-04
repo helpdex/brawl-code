@@ -5,6 +5,7 @@ import debug from "./debug"
 import terminal from "./terminal"
 import file from "./file"
 import review from "./review"
+import brawlPlan from "./brawl-plan"
 import details from "./details"
 import browser from "./browser"
 import pairing from "./pairing"
@@ -23,6 +24,7 @@ export const builtins = compose({
   terminal,
   file,
   review,
+  "brawl-plan": brawlPlan,
   details,
   browser: { ...browser, mainEntry: () => import("./browser/main") },
   pairing: { ...pairing, mainEntry: () => import("./pairing/main") },
