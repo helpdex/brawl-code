@@ -106,6 +106,8 @@ describe("BrawlPrompt", () => {
       expect(prompt).toContain("Search the web with websearch")
       expect(prompt.indexOf("Use the edit tool")).toBeLessThan(prompt.indexOf("docs tool"))
       expect(BrawlPrompt.brawl(tools)).toBe(SessionSystemPrompt.render(PROMPT, tools))
+      expect(BrawlPrompt.brawl([...tools, "todowrite"])).toContain("write the plan with todowrite before you start")
+      expect(BrawlPrompt.brawl(tools)).not.toContain("todowrite")
     }),
   )
 })

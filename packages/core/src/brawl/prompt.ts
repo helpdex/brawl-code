@@ -26,6 +26,8 @@ export const Plugin = define({
 
 export function brawl(tools: string[]) {
   const lookups = [
+    tools.includes("todowrite") &&
+      "- For a task with three or more steps, write the plan with todowrite before you start and keep it current: mark an item in_progress when you start it and completed as soon as it is done. The user follows this plan beside the chat.",
     tools.includes("docs") &&
       "- Before you write or change code that relies on a library, framework, SDK or API, check its current documentation with the docs tool rather than your memory: the code should fit the version in use today.",
     tools.includes("websearch") &&
