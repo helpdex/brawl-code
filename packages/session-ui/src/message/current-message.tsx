@@ -11,6 +11,7 @@ import {
 import { currentToolError, currentToolInput, currentToolMetadata, currentToolOutput } from "./current-tool-state"
 import type { UserRun } from "../timeline/user-runs"
 import type { TurnSources } from "../sources/sources"
+import { toolDuration } from "../brawl/timeline-text"
 
 export type { SessionUserActions, SessionUserAttachmentReference, SessionUserComment } from "../actions"
 
@@ -106,6 +107,7 @@ export function SessionAssistantContent(props: {
             metadata={currentToolMetadata(tool())}
             output={currentToolOutput(tool())}
             status={tool().state.status}
+            duration={toolDuration(tool().time)}
             error={currentToolError(tool())}
             defaultOpen={props.defaultOpen}
             open={props.toolOpen}

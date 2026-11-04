@@ -16,3 +16,4 @@
 @import "../components/tool-count-summary.css" layer(components);
 @import "../components/tool-error-card.css" layer(components);
 @import "../components/tool-status-title.css" layer(components);
+@import "../brawl/timeline.css" layer(components);

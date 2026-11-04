@@ -90,7 +90,7 @@ describe("settings schema", () => {
   test("supplies the existing defaults for an empty document", () => {
     expect(decode({})).toEqual({
       general: {
-        timelineDetail: timelinePresets[2].value,
+        timelineDetail: timelinePresets[1].value,
         showCustomAgents: false,
         showTurnDiffs: false,
         backgroundActivity: "left",
@@ -150,7 +150,7 @@ describe("settings schema", () => {
     expect(settings.general).toMatchObject({
       showTerminal: true,
       autoSave: false,
-      timelineDetail: timelinePresets[2].value,
+      timelineDetail: timelinePresets[1].value,
       followUpBehavior: "steer",
       backgroundActivity: "left",
       timelineWidth: "comfortable",

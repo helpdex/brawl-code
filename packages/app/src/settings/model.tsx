@@ -298,7 +298,7 @@ export const settingsPersistence = Persistence.migrate(
 
 export const defaultSettings: Settings = {
   general: {
-    timelineDetail: { ...timelinePresets[2].value },
+    timelineDetail: { ...timelinePresets[1].value },
     showCustomAgents: false,
     showTurnDiffs: false,
     backgroundActivity: "left",

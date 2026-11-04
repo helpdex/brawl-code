@@ -66,6 +66,8 @@ import { AssistantReasoningContent, writeClipboard } from "../message/message-co
 import { stripAnsi } from "./ansi"
 import { followShellOutput } from "./shell-output"
 import { LinkedText } from "../components/linked-text"
+import { ChangeCount, CommandResult, DiffPreview } from "../brawl/timeline"
+import { exploreSummary, language as brawlLanguage, toolDuration } from "../brawl/timeline-text"
 
 function ShellSubmessage(props: { text: string; animate?: boolean }) {
   let widthRef: HTMLSpanElement | undefined
@@ -158,6 +160,8 @@ const toolMetadata = Schema.decodeUnknownSync(
 type ToolInput = ReturnType<typeof toolInput>
 
 type ToolMetadata = ReturnType<typeof toolMetadata>
+
+const decodeExit = Schema.decodeUnknownOption(Schema.Finite)
 
 const decodeString = Schema.decodeUnknownOption(Schema.String)
 
@@ -469,6 +473,20 @@ export function CurrentContextToolGroup(props: {
     })
   })
 
+  const explore = createMemo(() =>
+    thinking()
+      ? undefined
+      : exploreSummary(
+          props.parts.flatMap((part) => {
+            if (part.type === "tool") return [part.name]
+
+            return part.type === "shell" ? ["shell"] : []
+          }),
+          pending(),
+          brawlLanguage(i18n.locale()),
+        ),
+  )
+
   const label = createMemo(() => {
     const thoughts = reasoning().length
 
@@ -476,6 +494,21 @@ export function CurrentContextToolGroup(props: {
       const text = i18n.t("ui.sessionTurn.status.thinking")
 
       return { text, title: text, before: "", count: undefined, between: "", after: "" }
+    }
+
+    const explored = explore()
+
+    if (explored) {
+      const after = explored.details.map((detail) => `· ${detail}`).join(" ")
+
+      return {
+        text: `${explored.title} ${after}`,
+        title: explored.title,
+        before: "",
+        count: undefined,
+        between: "",
+        after,
+      }
     }
 
     if (!names() && !thoughts) {
@@ -583,6 +616,7 @@ export function CurrentContextToolGroup(props: {
       ref={root}
       data-component="collapsed-tool-group"
       data-timeline-part-ids={props.parts.map((part) => part.id).join(",")}
+      data-brawl-explored={explore() ? "" : undefined}
     >
       <BasicTool
         icon="glasses"
@@ -594,6 +628,11 @@ export function CurrentContextToolGroup(props: {
         onOpenChange={change}
         trigger={
           <div data-component="context-tool-group-trigger" aria-label={label().text}>
+            <Show when={explore() && !pending()}>
+              <span data-slot="brawl-explore-check" aria-hidden="true">
+                ✓
+              </span>
+            </Show>
             <span data-slot="context-tool-group-title">
               <Show when={label().before || label().count || label().between}>
                 <span data-slot="context-tool-group-usage">
@@ -732,6 +771,7 @@ export function CurrentContextToolGroup(props: {
                                         output={currentToolOutput(tool())}
                                         error={currentToolError(tool())}
                                         status={tool().state.status}
+                                        duration={toolDuration(tool().time)}
                                         defaultOpen={props.toolDefaultOpen?.(tool()) ?? false}
                                         open={props.toolOpen?.(tool().id) ?? props.toolDefaultOpen?.(tool())}
                                         onOpenChange={(open) => props.onToolOpenChange?.(tool().id, open)}
@@ -994,7 +1034,7 @@ export function CurrentFileToolGroup(props: {
             patch: createTwoFilesPatch(input.path, input.path, "", input.content),
             additions: input.content.split("\n").length - Number(input.content.endsWith("\n")),
             deletions: 0,
-            status: "modified" as const,
+            status: currentToolOutput(tool)?.startsWith("Created file") ? ("added" as const) : ("modified" as const),
           },
         },
       ]
@@ -1138,6 +1178,7 @@ export interface ToolProps {
   pendingFiles?: readonly string[]
   forceOpen?: boolean
   locked?: boolean
+  duration?: number
 }
 
 type ToolComponent = Component<ToolProps>
@@ -2288,8 +2329,14 @@ ToolRegistry.register({
         ),
       )
 
-      return <ConsoleOutput command={command()} output={output()} />
+      return <ConsoleOutput command={output() ? undefined : command()} output={output()} />
     }
+
+    const exit = createMemo(() =>
+      pending() || props.status !== "completed" ? undefined : Option.getOrUndefined(decodeExit(props.metadata.exit)),
+    )
+
+    const title = () => command().split("\n")[0] || i18n.t("ui.tool.shell")
 
     return (
       <BasicTool
@@ -2302,10 +2349,12 @@ ToolRegistry.register({
         trigger={(open) => (
           <div data-slot="basic-tool-tool-info-structured">
             <div data-slot="basic-tool-tool-info-main">
-              <span data-slot="basic-tool-tool-title">
-                <TextShimmer text={i18n.t("ui.tool.shell")} active={pending()} />
+              <span data-slot={command() ? "brawl-command-title" : "basic-tool-tool-title"} title={command()}>
+                <Show when={pending() || !command()} fallback={title()}>
+                  <TextShimmer text={title()} active={pending()} />
+                </Show>
               </span>
-              <Show when={!open()}>
+              <Show when={!open() && !command()}>
                 <Show
                   when={command()}
                   fallback={
@@ -2316,6 +2365,9 @@ ToolRegistry.register({
                 >
                   {(command) => <ShellSubmessage text={command()} animate={sawStreaming} />}
                 </Show>
+              </Show>
+              <Show when={exit() !== undefined}>
+                <CommandResult exit={exit()!} duration={props.duration} />
               </Show>
             </div>
           </div>
@@ -2588,9 +2640,7 @@ ToolRegistry.register({
                         <div data-slot="apply-patch-trigger-actions">
                           <Switch>
                             <Match when={file().type === "add"}>
-                              <span data-slot="apply-patch-change" data-type="added">
-                                {i18n.t("ui.patch.action.created")}
-                              </span>
+                              <ChangeCount additions={file().additions} deletions={file().deletions} added />
                             </Match>
                             <Match when={file().type === "delete"}>
                               <span data-slot="apply-patch-change" data-type="removed">
@@ -2598,10 +2648,7 @@ ToolRegistry.register({
                               </span>
                             </Match>
                             <Match when={true}>
-                              <DiffChanges
-                                appearance="standard"
-                                changes={{ additions: file().additions, deletions: file().deletions }}
-                              />
+                              <ChangeCount additions={file().additions} deletions={file().deletions} />
                             </Match>
                           </Switch>
                           <Icon name="chevron-grabber-vertical" size="small" />
@@ -2610,20 +2657,22 @@ ToolRegistry.register({
                     }
                   >
                     <Show when={props.deferContent === false || visible()}>
-                      <For each={file().views}>
-                        {(view) => (
-                          <div data-component="apply-patch-file-diff">
-                            <Dynamic
-                              component={fileComponent}
-                              mode="diff"
-                              virtualize={props.virtualizeDiff}
-                              fileDiff={view.fileDiff}
-                              hunkSeparators={view.fileDiff.isPartial ? "simple" : "line-info-basic"}
-                              onRendered={props.onContentRendered}
-                            />
-                          </div>
-                        )}
-                      </For>
+                      <DiffPreview onToggle={props.onContentRendered}>
+                        <For each={file().views}>
+                          {(view) => (
+                            <div data-component="apply-patch-file-diff">
+                              <Dynamic
+                                component={fileComponent}
+                                mode="diff"
+                                virtualize={props.virtualizeDiff}
+                                fileDiff={view.fileDiff}
+                                hunkSeparators={view.fileDiff.isPartial ? "simple" : "line-info-basic"}
+                                onRendered={props.onContentRendered}
+                              />
+                            </div>
+                          )}
+                        </For>
+                      </DiffPreview>
                     </Show>
                   </FileAccordionItem>
                 )
