@@ -17,6 +17,17 @@ export function fullNumber(value: number, lang: Language = language) {
   return new Intl.NumberFormat(lang === "ru" ? "ru-RU" : "en-US").format(value)
 }
 
+const sections: Readonly<Record<string, string>> = {
+  Context: "Контекст",
+  Plan: "План",
+  Changes: "Изменения",
+  Brawl: "Brawl",
+}
+
+export function sectionTitle(title: string, lang: Language = language) {
+  return (lang === "ru" ? (sections[title] ?? title) : title).toUpperCase()
+}
+
 export const BRAWL_DEFAULT_WINDOW = 262_144
 
 export function contextWindow(model: { providerID: string; id?: string; variant?: string }, limit: number | undefined) {

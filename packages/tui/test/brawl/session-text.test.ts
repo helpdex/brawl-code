@@ -8,6 +8,7 @@ import {
   meterCells,
   previewLines,
   previewPatch,
+  sectionTitle,
   shortPath,
   sumChanges,
 } from "../../src/brawl/session-text"
@@ -105,5 +106,12 @@ describe("Brawl session text", () => {
     expect(shortPath("lib/shop/payments/yookassa.ex", 40)).toBe("lib/shop/payments/yookassa.ex")
     expect(shortPath("lib/shop/payments/yookassa.ex", 20)).toBe("payments/yookassa.ex")
     expect(shortPath("lib/a_very_long_file_name.ex", 10)).toBe("…e_name.ex")
+  })
+
+  test("a section title, translated by the build or not", () => {
+    expect(sectionTitle("Context", "en")).toBe("CONTEXT")
+    expect(sectionTitle("Context", "ru")).toBe("КОНТЕКСТ")
+    expect(sectionTitle("Контекст", "ru")).toBe("КОНТЕКСТ")
+    expect(sectionTitle("Plan", "ru")).toBe("ПЛАН")
   })
 })

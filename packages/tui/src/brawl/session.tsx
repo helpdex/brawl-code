@@ -4,19 +4,17 @@ import { useTheme } from "../context/theme"
 import type { ResolvedTheme } from "@opencode/theme/tui"
 import type { Todo } from "../util/todo"
 import { counted, language } from "./i18n"
-import { meterCells } from "./session-text"
+import { meterCells, sectionTitle } from "./session-text"
 
 export function accent(theme: ResolvedTheme) {
   return theme.background.action.primary.focused
 }
 
-const sections = { Context: "Контекст", Plan: "План", Changes: "Изменения", Brawl: "Brawl" }
-
-export function SectionTitle(props: { theme?: ResolvedTheme; title: keyof typeof sections; count?: string }) {
+export function SectionTitle(props: { theme?: ResolvedTheme; title: string; count?: string }) {
   const theme = props.theme ?? useTheme()
   return (
     <box flexDirection="row" justifyContent="space-between">
-      <text fg={theme.text.muted}>{(language === "ru" ? sections[props.title] : props.title).toUpperCase()}</text>
+      <text fg={theme.text.muted}>{sectionTitle(props.title)}</text>
       <Show when={props.count}>{(count) => <text fg={theme.text.muted}>{count()}</text>}</Show>
     </box>
   )
