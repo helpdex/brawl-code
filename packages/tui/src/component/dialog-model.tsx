@@ -15,6 +15,8 @@ import { DialogFreeModels } from "./dialog-model-free"
 import { FavoriteMarker, ModelDetail, isFreeModel, prioritizeFavorites, sortModelOptions } from "./model-options"
 import { DialogUsage, useUsageLimits } from "./usage"
 import { formatDollars, usageLevel } from "../util/usage-limits"
+import { Brawl } from "@opencode/util/brawl"
+import { brawlModelNote } from "../brawl/usage-text"
 
 export function DialogModel(props: { providerID?: string }) {
   const local = useLocal()
@@ -85,6 +87,7 @@ function DialogConnectedModels(props: {
   // Under new designs the detail row shows the price, so the trailing slot only marks favorites.
   const trailing = (model: ModelInfo, favorite: boolean) => {
     if (newDesigns()) return favorite ? <FavoriteMarker /> : undefined
+    if (model.providerID === Brawl.id && model.limit.context > 0) return brawlModelNote(model, limits.info()?.brawl)
     return isFreeModel(model) ? "Free" : undefined
   }
   // OpenCode's own free models get their own group at the end of the list instead of joining "OpenCode".

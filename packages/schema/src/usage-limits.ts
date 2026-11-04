@@ -66,6 +66,8 @@ export interface BrawlWindow extends Schema.Schema.Type<typeof BrawlWindow> {}
 export const BrawlWindow = Schema.Struct({
   id: Schema.String,
   percent: Percent,
+  used: Schema.Finite.pipe(optional),
+  limit: Schema.Finite.pipe(optional),
   limited: Schema.Boolean,
   resetsAt: Instant,
 }).annotate({ identifier: "UsageLimits.BrawlWindow" })

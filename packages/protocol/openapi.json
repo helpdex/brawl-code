@@ -25375,6 +25375,12 @@
             "minimum": 0,
             "maximum": 100
           },
+          "used": {
+            "type": "number"
+          },
+          "limit": {
+            "type": "number"
+          },
           "limited": {
             "type": "boolean"
           },

@@ -12,6 +12,7 @@ export type SidebarText = {
   plan: (plan: string) => string
   streams: (used: number, limit: number) => string
   window: (id: string, percent: number) => string
+  steps: (used: number, limit: number) => string
   usage: string
 }
 
@@ -74,9 +75,16 @@ const russian: SidebarText = {
 
     return new Date(at).toLocaleDateString("ru", { day: "numeric", month: "long" })
   },
-  plan: (plan) => (plan === "beta" ? "Бета · бесплатно" : plan.charAt(0).toUpperCase() + plan.slice(1)),
+  plan: (plan) => {
+    if (plan === "beta") return "Бета · бесплатно"
+
+    if (plan === "free") return "Free · бесплатно"
+
+    return plan.charAt(0).toUpperCase() + plan.slice(1)
+  },
   streams: (used, limit) => `${used} из ${limit} ${ruPlural(limit, "потока", "потоков", "потоков")}`,
   window: (id, percent) => `${id} · ${percent}%`,
+  steps: (used, limit) => `${used} из ${limit} ${limit % 10 === 1 && limit % 100 !== 11 ? "шага" : "шагов"}`,
   usage: "Использование на brawl.io",
 }
 
@@ -114,9 +122,16 @@ const english: SidebarText = {
 
     return new Date(at).toLocaleDateString("en", { day: "numeric", month: "long" })
   },
-  plan: (plan) => (plan === "beta" ? "Beta · free" : plan.charAt(0).toUpperCase() + plan.slice(1)),
+  plan: (plan) => {
+    if (plan === "beta") return "Beta · free"
+
+    if (plan === "free") return "Free · no charge"
+
+    return plan.charAt(0).toUpperCase() + plan.slice(1)
+  },
   streams: (used, limit) => `${used} of ${limit} ${limit === 1 ? "stream" : "streams"}`,
   window: (id, percent) => `${id} · ${percent}%`,
+  steps: (used, limit) => `${used} of ${limit} steps`,
   usage: "Usage on brawl.io",
 }
 

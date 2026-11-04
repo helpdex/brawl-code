@@ -54,6 +54,7 @@ describe("Brawl session text", () => {
     expect(contextWindow({ providerID: "brawl", variant: "1M" }, 1_048_576)).toBe(1_048_576)
     expect(contextWindow({ providerID: "brawl" }, undefined)).toBe(262_144)
     expect(contextWindow({ providerID: "anthropic" }, 200_000)).toBe(200_000)
+    expect(contextWindow({ providerID: "brawl", id: "brawl-code-free" }, 1_048_576)).toBe(1_048_576)
   })
 
   test("a meter shows any use and never overflows", () => {

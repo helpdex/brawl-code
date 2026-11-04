@@ -35,7 +35,10 @@ type Device = typeof Device.Type
 const Token = Schema.Struct({ access_token: Schema.String })
 const TokenError = Schema.Struct({ error: Schema.String })
 const decodeTokenError = Schema.decodeUnknownOption(Schema.fromJsonString(TokenError))
-const Account = Schema.Struct({ email: Schema.NullOr(Schema.String) })
+const Account = Schema.Struct({
+  email: Schema.NullOr(Schema.String),
+  models: Schema.optional(Schema.Array(Schema.Struct({ id: Schema.String }))),
+})
 const Manifest = Schema.Struct({
   config: Schema.Struct({
     providers: Schema.Record(Schema.String, Schema.Record(Schema.String, Schema.Unknown)),
@@ -81,11 +84,16 @@ export const Plugin = define<Bus.Service | Config.Service | Scope.Scope>({
         .pipe(Effect.orElseSucceed(() => undefined))
       const site = text(credential?.metadata?.site) ?? Brawl.site
       const api = text(credential?.metadata?.api) ?? Brawl.api
-      const loaded = yield* manifest(site, api, ctx.app).pipe(
+      const key =
+        credential?.type === "oauth" ? credential.access : credential?.type === "key" ? credential.key : undefined
+      const owned = key ? yield* accountModels(api, key, ctx.app) : undefined
+      const loaded = yield* manifest(site, api, owned, ctx.app).pipe(
         Effect.catch((cause) =>
           Effect.logWarning("failed to load the Brawl provider config", { site, cause }).pipe(
             Effect.andThen(
-              snapshot.remote ? Effect.succeed(snapshot.remote) : remote(fallback, api).pipe(Effect.orDie),
+              snapshot.remote
+                ? Effect.succeed(snapshot.remote)
+                : remote(tiers(fallback, owned), api).pipe(Effect.orDie),
             ),
           ),
         ),
@@ -235,10 +243,40 @@ function credential(site: string, api: string, key: string, app: App.Info) {
   )
 }
 
-function manifest(site: string, api: string, app: App.Info) {
+function manifest(site: string, api: string, owned: ReadonlyArray<string> | undefined, app: App.Info) {
   return request(`${site}/.well-known/opencode`, { headers: headers(app) }, Manifest).pipe(
-    Effect.flatMap((value) => remote(value.config.providers, api)),
+    Effect.flatMap((value) => remote(tiers(value.config.providers, owned), api)),
   )
+}
+
+function accountModels(api: string, key: string, app: App.Info) {
+  return request(`${api}/account`, { headers: { ...headers(app), Authorization: `Bearer ${key}` } }, Account).pipe(
+    Effect.map((account) => account.models?.map((model) => model.id)),
+    Effect.orElseSucceed(() => undefined),
+  )
+}
+
+export function tiers(
+  providers: Readonly<Record<string, Readonly<Record<string, unknown>>>>,
+  owned: ReadonlyArray<string> | undefined,
+) {
+  const brawl = providers[Brawl.id]
+  const hasPrivate = owned?.includes(Brawl.models.private) ?? false
+  if (!brawl || !owned?.includes(Brawl.models.free)) return providers
+  const site = isRecord(brawl.models) ? Object.values(brawl.models).find(isRecord) : undefined
+  const output = isRecord(site?.limit) && typeof site.limit.output === "number" ? site.limit.output : 32768
+  const base = { capabilities: site?.capabilities ?? { reasoning: { supported: true } } }
+  const oneM = owned.includes(Brawl.models.oneM)
+  const models: Record<string, unknown> = {}
+  if (hasPrivate)
+    models[Brawl.models.main] = {
+      ...base,
+      name: "Brawl Code 1.0 Private",
+      limit: { context: oneM ? 1048576 : 262144, output },
+      ...(oneM ? { variants: [{ id: "1M", body: { model: Brawl.models.oneM } }] } : {}),
+    }
+  models[Brawl.models.free] = { ...base, name: "Brawl Code 1.0 Free", limit: { context: 1048576, output } }
+  return { ...providers, [Brawl.id]: { ...brawl, models, images: hasPrivate } }
 }
 
 export const visibleTools = { "X-Brawl-Tools": "visible" }
@@ -252,7 +290,7 @@ export const imageModel = {
 function remote(providers: Readonly<Record<string, Readonly<Record<string, unknown>>>>, api: string) {
   return Schema.decodeUnknownEffect(ConfigIntegration.Remote)({
     providers: Object.fromEntries(
-      Object.entries(providers).map(([id, provider]) => [
+      Object.entries(providers).map(([id, { images, ...provider }]) => [
         id,
         {
           ...provider,
@@ -261,7 +299,10 @@ function remote(providers: Readonly<Record<string, Readonly<Record<string, unkno
           ...(id === Brawl.id
             ? {
                 headers: { ...(isRecord(provider.headers) ? provider.headers : {}), ...visibleTools },
-                models: { ...(isRecord(provider.models) ? provider.models : {}), "brawl-image": imageModel },
+                models: {
+                  ...(isRecord(provider.models) ? provider.models : {}),
+                  ...(images === false ? {} : { "brawl-image": imageModel }),
+                },
               }
             : {}),
         },

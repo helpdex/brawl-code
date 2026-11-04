@@ -77,7 +77,9 @@ export function BrawlSidebarAccount(props: { entries: InboxEntry[]; text: Sideba
               >
                 {(window) => (
                   <span class={`font-mono ${window().limited ? "text-v2-state-fg-danger" : "text-v2-text-text-faint"}`}>
-                    {props.text.window(window().id, Math.round(window().percent))}
+                    {window().used !== undefined && window().limit !== undefined
+                      ? props.text.steps(window().used ?? 0, window().limit ?? 0)
+                      : props.text.window(window().id, Math.round(window().percent))}
                   </span>
                 )}
               </Show>

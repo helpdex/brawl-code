@@ -104,7 +104,7 @@ describe("BrawlTools", () => {
             },
             { url: "https://hexdocs.pm/phoenix", time: {} },
           ])
-          expect(requests.filter((request) => request.path.startsWith("/v1/"))).toEqual([
+          expect(requests.filter((request) => request.path.startsWith("/v1/tools/"))).toEqual([
             {
               path: "/v1/tools/web_search",
               auth: "Bearer brawl_sk_test",

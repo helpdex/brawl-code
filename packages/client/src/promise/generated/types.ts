@@ -364,7 +364,14 @@ export type WebSearchResult = { url: string; title?: string; content?: string; t
 
 export type UsageLimitsMeter = { percent: number; limited: boolean; resetsAt: number }
 
-export type UsageLimitsBrawlWindow = { id: string; percent: number; limited: boolean; resetsAt: number }
+export type UsageLimitsBrawlWindow = {
+  id: string
+  percent: number
+  used?: number
+  limit?: number
+  limited: boolean
+  resetsAt: number
+}
 
 export type McpProtocol = "legacy" | "auto" | "2026-07-28"
 

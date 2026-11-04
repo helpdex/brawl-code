@@ -37,4 +37,11 @@ describe("sidebarText", () => {
     expect(sidebarText("en").streams(1, 2)).toBe("1 of 2 streams")
     expect(sidebarText("en").plan("pro")).toBe("Pro")
   })
+
+  test("Free names its plan and the steps of the day", () => {
+    expect(sidebarText("ru").plan("free")).toBe("Free · бесплатно")
+    expect(sidebarText("ru").steps(57, 200)).toBe("57 из 200 шагов")
+    expect(sidebarText("ru").steps(3, 251)).toBe("3 из 251 шага")
+    expect(sidebarText("en").steps(57, 200)).toBe("57 of 200 steps")
+  })
 })

@@ -5,6 +5,8 @@ import { useData } from "@/runtime/server/current"
 import { useWorkspaceLocation } from "@/workspaces/location"
 import { useUsageFormat } from "./format"
 import { modelUsage } from "./limits"
+import { Brawl } from "@opencode/util/brawl"
+import { sidebarText } from "@/brawl/sidebar-text"
 
 /** What a paid model has left under the member's Console budgets, written for the model picker. */
 export type ModelUsageLabel = {
@@ -30,6 +32,14 @@ export function createModelUsage(options: { refresh?: boolean } = {}) {
   })
   return (model: Parameters<typeof modelUsage>[1] & Parameters<typeof isFreeModel>[0]): ModelUsageLabel | undefined => {
     const info = data.location.usage.limits(location().ref)
+    const day = model.id === Brawl.models.free ? info?.brawl?.windows.find((window) => window.id === "day") : undefined
+    if (model.provider.id === Brawl.id && day?.used !== undefined && day.limit !== undefined)
+      return {
+        label: sidebarText(language.locale()).steps(day.used, day.limit),
+        reached: day.limited,
+        left: String(Math.max(0, day.limit - day.used)),
+        resets: format.shortTime(day.resetsAt),
+      }
     const usage = info && !isFreeModel(model) ? modelUsage(info, model) : undefined
     if (!usage) return
     return {

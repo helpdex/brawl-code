@@ -19,8 +19,9 @@ export function fullNumber(value: number, lang: Language = language) {
 
 export const BRAWL_DEFAULT_WINDOW = 262_144
 
-export function contextWindow(model: { providerID: string; variant?: string }, limit: number | undefined) {
-  if (model.providerID !== Brawl.id || model.variant?.toLowerCase() === "1m") return limit
+export function contextWindow(model: { providerID: string; id?: string; variant?: string }, limit: number | undefined) {
+  if (model.providerID !== Brawl.id || model.id === Brawl.models.free || model.variant?.toLowerCase() === "1m")
+    return limit
   return Math.min(limit ?? BRAWL_DEFAULT_WINDOW, BRAWL_DEFAULT_WINDOW)
 }
 

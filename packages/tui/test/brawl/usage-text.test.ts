@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test"
-import { brawlText, fullest, windowLevel } from "../../src/brawl/usage-text"
+import { brawlModelNote, brawlStepsLabel, brawlText, fullest, windowLevel } from "../../src/brawl/usage-text"
 
 const at = Date.parse("2030-01-02T15:30:00")
 const window = (id: string, percent: number, limited = false) => ({ id, percent, limited, resetsAt: at })
@@ -35,5 +35,32 @@ describe("Brawl usage text", () => {
     expect(windowLevel(window("5h", 79))).toBe("plenty")
     expect(windowLevel(window("5h", 80))).toBe("low")
     expect(windowLevel(window("5h", 20, true))).toBe("reached")
+  })
+
+  test("Free's plan and its steps of the day", () => {
+    const day = { ...window("day", 28.5), used: 57, limit: 200 }
+    const free = { ...beta, plan: "free", windows: [day] }
+    expect(brawlText("ru").plan("free")).toBe("Free · бесплатно")
+    expect(brawlText("ru").window(day)).toBe("сутки")
+    expect(brawlText("ru").used(day)).toBe("57 из 200 шагов")
+    expect(brawlText("ru").used({ ...day, limit: 251 })).toBe("57 из 251 шага")
+    expect(brawlText("en").used(day)).toBe("57 of 200 steps")
+    expect(brawlStepsLabel(free, "ru")).toEqual({ text: "57 из 200 шагов", danger: false })
+    expect(brawlStepsLabel({ ...free, windows: [{ ...day, used: 200, limited: true }] }, "en")?.danger).toBe(true)
+    expect(brawlStepsLabel(beta, "ru")).toBeUndefined()
+  })
+
+  test("what the model picker says of each Brawl model", () => {
+    const day = { ...window("day", 28.5), used: 57, limit: 200 }
+    const free = { ...beta, plan: "free", windows: [day] }
+    const model = (id: string, context: number, variants: string[] = []) => ({
+      id,
+      limit: { context },
+      variants: variants.map((variant) => ({ id: variant })),
+    })
+    expect(brawlModelNote(model("brawl-code-free", 1048576), free, "ru")).toBe("1M · 57 из 200 шагов")
+    expect(brawlModelNote(model("brawl-code-free", 1048576), undefined, "en")).toBe("1M")
+    expect(brawlModelNote(model("brawl-code", 1048576, ["1M"]), undefined, "en")).toBe("262K · 1M")
+    expect(brawlModelNote(model("brawl-code", 262144), undefined, "en")).toBe("262K")
   })
 })

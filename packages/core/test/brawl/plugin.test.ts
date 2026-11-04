@@ -1,4 +1,4 @@
-import { describe, expect } from "bun:test"
+import { describe, expect, test } from "bun:test"
 import { Effect } from "effect"
 import { BrawlPlugin } from "@opencode/core/brawl/plugin"
 import { Credential } from "@opencode/core/credential"
@@ -44,7 +44,10 @@ const manifest = {
   auth: { command: ["brawl", "login", "--print-key", "--agent", "opencode"], env: "BRAWL_API_KEY" },
 }
 
-function site(token: (polls: number) => Response = () => Response.json({ access_token: "brawl_sk_test" })) {
+function site(
+  token: (polls: number) => Response = () => Response.json({ access_token: "brawl_sk_test" }),
+  account: Record<string, unknown> = { email: "owner@example.com", plan: "beta", limits: null },
+) {
   const requests: string[] = []
   const devices: Record<string, string>[] = []
   const polls = { count: 0 }
@@ -71,7 +74,7 @@ function site(token: (polls: number) => Response = () => Response.json({ access_
       }
       if (url.pathname === "/v1/account") {
         if (request.headers.get("authorization") !== "Bearer brawl_sk_test") return new Response(null, { status: 401 })
-        return Response.json({ email: "owner@example.com", plan: "beta", limits: null })
+        return Response.json(account)
       }
       if (url.pathname === "/.well-known/opencode") return Response.json(manifest)
       return new Response("Not found", { status: 404 })
@@ -206,6 +209,36 @@ describe("BrawlPlugin", () => {
     ),
   )
 
+  it.live("gives an account on Brawl Code 1.0 Free only the Free model, without pictures", () =>
+    Effect.acquireUseRelease(
+      Effect.sync(() =>
+        site(undefined, {
+          email: "free@example.com",
+          plan: "free",
+          limits: { concurrent: 1, windows: [] },
+          models: [{ id: "brawl-code-free", name: "Brawl Code 1.0 Free" }],
+        }),
+      ),
+      ({ server }) =>
+        Effect.gen(function* () {
+          yield* addPlugin()
+          const integrations = yield* Integration.Service
+          yield* integrations.connection.key({
+            integrationID,
+            key: "brawl_sk_test",
+            answer: { site: server.url.origin, api: `${server.url.origin}/v1` },
+          })
+          const models = yield* Model.Service
+          const free = yield* eventually(models.get(providerID, Model.ID.make("brawl-code-free")), (value) => !!value)
+          expect(free?.name).toBe("Brawl Code 1.0 Free")
+          expect(free?.limit.context).toBe(1048576)
+          expect(yield* models.get(providerID, Model.ID.make("brawl-code"))).toBeUndefined()
+          expect(yield* models.available(["image"])).toEqual([])
+        }),
+      ({ server }) => Effect.promise(() => server.stop(true)),
+    ),
+  )
+
   it.live("keeps the built-in models when the site cannot be reached", () =>
     Effect.gen(function* () {
       yield* addPlugin()
@@ -223,4 +256,45 @@ describe("BrawlPlugin", () => {
       expect(yield* models.get(providerID, Model.ID.make("brawl-code-next"))).toBeUndefined()
     }),
   )
+})
+
+describe("BrawlPlugin.tiers", () => {
+  const providers = manifest.config.providers
+
+  test("leaves the site's models to a proxy without Free", () => {
+    expect(BrawlPlugin.tiers(providers, undefined)).toBe(providers)
+    expect(BrawlPlugin.tiers(providers, ["brawl-code", "brawl-code-1m"])).toBe(providers)
+  })
+
+  test("gives Private with its 1M variant and Free to an account with the access", () => {
+    const brawl = BrawlPlugin.tiers(providers, ["brawl-code-private", "brawl-code-1m", "brawl-code-free"]).brawl
+    expect(brawl.images).toBe(true)
+    expect(brawl.models).toEqual({
+      "brawl-code": {
+        capabilities: { reasoning: { supported: true } },
+        name: "Brawl Code 1.0 Private",
+        limit: { context: 1048576, output: 32768 },
+        variants: [{ id: "1M", body: { model: "brawl-code-1m" } }],
+      },
+      "brawl-code-free": {
+        capabilities: { reasoning: { supported: true } },
+        name: "Brawl Code 1.0 Free",
+        limit: { context: 1048576, output: 32768 },
+      },
+    })
+  })
+
+  test("keeps Private at 262K without a variant while the 1M mode is down", () => {
+    const brawl = BrawlPlugin.tiers(providers, ["brawl-code-private", "brawl-code-free"]).brawl
+    expect((brawl.models as Record<string, unknown>)["brawl-code"]).toMatchObject({
+      limit: { context: 262144 },
+    })
+    expect((brawl.models as Record<string, Record<string, unknown>>)["brawl-code"].variants).toBeUndefined()
+  })
+
+  test("gives an account on Free only Brawl Code 1.0 Free", () => {
+    const brawl = BrawlPlugin.tiers(providers, ["brawl-code-free"]).brawl
+    expect(Object.keys(brawl.models as object)).toEqual(["brawl-code-free"])
+    expect(brawl.images).toBe(false)
+  })
 })

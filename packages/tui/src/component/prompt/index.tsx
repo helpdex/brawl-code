@@ -71,6 +71,8 @@ import { useWorkingDirectoryActions } from "../../ui/working-directory-actions"
 import { truncateFilePath } from "../../ui/file-path"
 import { PromptMetadataRow } from "./metadata"
 import { limitLabel, useUsageLimits } from "../usage"
+import { Brawl } from "@opencode/util/brawl"
+import { brawlStepsLabel } from "../../brawl/usage-text"
 
 export type PromptProps = {
   sessionID?: string
@@ -1578,10 +1580,13 @@ export function Prompt(props: PromptProps) {
   const limits = useUsageLimits()
   createEffect(() => {
     const selected = local.model.current()
-    if (selected && limits.served(selected.providerID) && limits.info() === undefined) limits.load()
+    const served = selected && (limits.served(selected.providerID) || selected.providerID === Brawl.id)
+    if (served && limits.info() === undefined) limits.load()
   })
   const limit = createMemo(() => {
     const selected = local.model.current()
+    if (selected?.providerID === Brawl.id && selected.modelID === Brawl.models.free)
+      return brawlStepsLabel(limits.info()?.brawl)
     const model = limits
       .models()
       .find((item) => item.providerID === selected?.providerID && item.id === selected?.modelID)

@@ -9,6 +9,8 @@ import { Integration } from "../integration.js"
 const Window = Schema.Struct({
   id: Schema.String,
   used_percent: Schema.Finite,
+  used: Schema.optional(Schema.Finite),
+  limit: Schema.optional(Schema.Finite),
   limited: Schema.Boolean,
   resets_at: Schema.DateFromString,
 })
@@ -60,6 +62,7 @@ function info(account: typeof Account.Type, site: string): UsageLimits.Info {
       windows: (account.limits?.windows ?? []).map((window) => ({
         id: window.id,
         percent: Math.min(100, Math.max(0, window.used_percent)),
+        ...(window.used !== undefined && window.limit !== undefined ? { used: window.used, limit: window.limit } : {}),
         limited: window.limited,
         resetsAt: window.resets_at.getTime(),
       })),
